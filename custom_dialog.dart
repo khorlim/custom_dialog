@@ -8,12 +8,8 @@ import 'triangle.dart';
 
 part 'enum.dart';
 
-//I am here
-// I am here again
-
 class CustomDialog extends StatefulWidget {
   final BuildContext context;
-  final GlobalKey? targetWidgetKey;
   final double height;
   final double width;
   final Widget? appBar;
@@ -33,7 +29,6 @@ class CustomDialog extends StatefulWidget {
   CustomDialog({
     required this.context,
     required this.child,
-    this.targetWidgetKey,
     this.appBar,
     this.width = 400,
     this.height = 650,
@@ -124,7 +119,8 @@ class _CustomDialogState extends State<CustomDialog> {
 
         break;
       case AlignTargetWidget.topCenter:
-        dialogTopPos = pos.dy - safeAreaTopHeight - widget.height - widget.arrowHeight;
+        dialogTopPos =
+            pos.dy - safeAreaTopHeight - widget.height - widget.arrowHeight;
         dialogLeftPos = pos.dx + (size.width / 2) - (widget.width / 2);
         arrowTopPos = dialogTopPos! + widget.height;
         arrowLeftPos = pos.dx + (size.width / 2) - (widget.arrowWidth / 2);
@@ -322,49 +318,39 @@ class _CustomDialogState extends State<CustomDialog> {
               ),
               if (enableArrow)
                 Positioned(
-                    top: arrowTopPos,
-                    left: arrowLeftPos,
-                    child: PhysicalModel(
-                      color: Colors.transparent,
-                      elevation: 3,
-                      shadowColor: Colors.grey.withOpacity(0.06),
-                      shape: BoxShape.circle,
-                      child: arrowPointing == ArrowPointing.top
-                          ? CustomPaint(
-                              painter: TriangleArrowTop(),
-                              child: Container(
-                                width: widget.arrowWidth,
-                                height: widget.arrowHeight,
-                              ),
-                            )
-                          : arrowPointing == ArrowPointing.left
-                              ? CustomPaint(
-                                  painter: TriangleArrowLeft(),
-                                  child: Container(
-                                    width: widget.arrowHeight,
-                                    height: widget.arrowWidth,
-                                  ),
-                                )
-                              : arrowPointing == ArrowPointing.bottom
-                                  ? CustomPaint(
-                                      painter: TriangleArrowDown(),
-                                      child: Container(
-                                        width: widget.arrowWidth,
-                                        height: widget.arrowHeight,
-                                      ),
-                                    )
-                                  : CustomPaint(
-                                      painter: TriangleArrowRight(),
-                                      child: Container(
-                                        width: widget.arrowHeight,
-                                        height: widget.arrowWidth,
-                                      ),
-                                    ),
-                    )),
+                  top: arrowTopPos,
+                  left: arrowLeftPos,
+                  child: PhysicalModel(
+                    color: Colors.transparent,
+                    elevation: 3,
+                    shadowColor: Colors.grey.withOpacity(0.06),
+                    shape: BoxShape.circle,
+                    child: CustomPaint(
+                      painter: _getArrowPainter(arrowPointing),
+                      child: Container(
+                        width: widget.arrowWidth,
+                        height: widget.arrowHeight,
+                      ),
+                    ),
+                  ),
+                )
             ],
           );
         });
       }),
     );
+  }
+
+  CustomPainter _getArrowPainter(ArrowPointing arrowPointing) {
+    switch (arrowPointing) {
+      case ArrowPointing.top:
+        return TriangleArrowTop();
+      case ArrowPointing.left:
+        return TriangleArrowLeft();
+      case ArrowPointing.bottom:
+        return TriangleArrowDown();
+      case ArrowPointing.right:
+        return TriangleArrowRight();
+    }
   }
 }
