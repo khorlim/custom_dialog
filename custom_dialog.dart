@@ -328,8 +328,14 @@ class _CustomDialogState extends State<CustomDialog> {
                     child: CustomPaint(
                       painter: _getArrowPainter(arrowPointing),
                       child: Container(
-                        width: widget.arrowWidth,
-                        height: widget.arrowHeight,
+                        width: arrowPointing == ArrowPointing.top ||
+                                arrowPointing == ArrowPointing.bottom
+                            ? widget.arrowWidth
+                            : widget.arrowHeight,
+                        height: arrowPointing == ArrowPointing.top ||
+                                arrowPointing == ArrowPointing.bottom
+                            ? widget.arrowHeight
+                            : widget.arrowWidth,
                       ),
                     ),
                   ),
