@@ -67,7 +67,7 @@ class _CustomDialogState extends State<CustomDialog> {
   @override
   void initState() {
     super.initState;
-    //Get essential data to calculate position
+    //Get essential data to calculate position yes
     enableArrow = widget.enableArrow;
     RenderBox? targetWidgetRBox =
         widget.targetWidgetContext?.findRenderObject() as RenderBox?;
