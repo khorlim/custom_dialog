@@ -25,6 +25,7 @@ class CustomDialog extends StatefulWidget {
   final bool jumpWhenOverflow;
   final double overflowLeft;
   final bool pushDialogAboveWhenKeyboardShow;
+  final bool followArrow;
 
   CustomDialog({
     required this.context,
@@ -43,6 +44,7 @@ class CustomDialog extends StatefulWidget {
     this.jumpWhenOverflow = true,
     this.overflowLeft = 0,
     this.pushDialogAboveWhenKeyboardShow = false,
+    this.followArrow = false,
   })  : dialogHeight = height,
         screenHeight = MediaQuery.of(context).size.height,
         screenWidth = MediaQuery.of(context).size.width,
@@ -83,6 +85,17 @@ class _CustomDialogState extends State<CustomDialog> {
           safeAreaTopHeight: widget.safeAreaTopHeight);
 
       addAdjustment(widget.alignTargetWidget, widget.adjustment);
+
+      //follow arrow
+      if(widget.followArrow) {
+       
+        if(dialogTopPos! >= arrowTopPos!) {
+          dialogTopPos = arrowTopPos! - widget.arrowWidth;
+        }
+        if(arrowTopPos! >= (dialogTopPos! + widget.height)){
+          dialogTopPos = arrowTopPos! - widget.height + widget.arrowWidth + 5;
+        }
+      }
 
       //if show overflow arrow = false
       arrowOverflowed =
@@ -176,10 +189,16 @@ class _CustomDialogState extends State<CustomDialog> {
 
         //Prevent dialog overflow
         if (dialogLeftPos! < 0) {
-          //Move the dialog to right
+          //Jump the dialog to right
           dialogLeftPos = pos.dx + size.width + widget.arrowHeight;
           arrowLeftPos = dialogLeftPos! - widget.arrowHeight;
           arrowPointing = ArrowPointing.left;
+
+          //if jump to right still oveflow stay right but move to left
+          if(dialogLeftPos! + widget.width > (widget.screenWidth - 10)){
+            dialogLeftPos = widget.screenWidth - widget.width - 10;
+            arrowLeftPos = dialogLeftPos! - widget.arrowHeight;
+          }
         }
 
         break;
@@ -242,14 +261,17 @@ class _CustomDialogState extends State<CustomDialog> {
 
   @override
   Widget build(BuildContext context) {
+    
     return SafeArea(
       child: KeyboardVisibilityBuilder(builder: (context, isKeyboardVisible) {
         return LayoutBuilder(builder: (context, constraints) {
           if (isKeyboardVisible) {
             double screenHeight = constraints.maxHeight;
+           
             double newHeight = widget.height -
                 (widget.paddingWhenKeyboardShow -
                     (screenHeight - (widget.height + dialogTopPos!)));
+
 
             if (widget.pushDialogAboveWhenKeyboardShow) {
               newHeight = widget.height -
