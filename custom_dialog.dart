@@ -92,7 +92,7 @@ class _CustomDialogState extends State<CustomDialog> {
         if(dialogTopPos! >= arrowTopPos!) {
           dialogTopPos = arrowTopPos! - widget.arrowWidth;
         }
-        if(arrowTopPos! >= (dialogTopPos! + widget.height)){
+        if((arrowTopPos! + widget.arrowWidth) >= (dialogTopPos! + widget.height)){
           dialogTopPos = arrowTopPos! - widget.height + widget.arrowWidth + 5;
         }
       }
