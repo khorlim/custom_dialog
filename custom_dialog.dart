@@ -216,6 +216,7 @@ class _CustomDialogState extends State<CustomDialog> {
           //if jump to right still oveflow stay right but move to left
           dialogLeftPos =
               preventHorizontalOverflow(dialogLeftPos!, widget.width);
+          arrowLeftPos = dialogLeftPos! - widget.arrowHeight;
         } 
 
         break;

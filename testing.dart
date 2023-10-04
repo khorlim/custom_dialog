@@ -55,9 +55,9 @@ class TestingCustomDialog extends StatelessWidget {
                                         height: 400,
                                         width: 600,
                                         targetWidgetContext: ctxt,
-                                        enableArrow: false,
-                                       showOverFlowArrow: false,
-                                        alignTargetWidget: AlignTargetWidget.leftCenter,
+                                        enableArrow: true,
+                                      // showOverFlowArrow: false,
+                                        alignTargetWidget: AlignTargetWidget.right,
                                         child: Container(
                                           color: Colors.green,
                                         ));
