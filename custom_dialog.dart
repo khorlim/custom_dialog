@@ -26,6 +26,7 @@ class CustomDialog extends StatefulWidget {
   final double overflowLeft;
   final bool pushDialogAboveWhenKeyboardShow;
   final bool followArrow;
+  final double distanceBetweenTargetWidget;
 
   CustomDialog({
     required this.context,
@@ -45,6 +46,7 @@ class CustomDialog extends StatefulWidget {
     this.overflowLeft = 0,
     this.pushDialogAboveWhenKeyboardShow = false,
     this.followArrow = false,
+    this.distanceBetweenTargetWidget = 0,
   })  : dialogHeight = height,
         screenHeight = MediaQuery.of(context).size.height,
         screenWidth = MediaQuery.of(context).size.width,
@@ -120,36 +122,36 @@ class _CustomDialogState extends State<CustomDialog> {
   }) {
     switch (alignment) {
       case AlignTargetWidget.bottomCenter:
-        dialogTopPos = pos.dy - safeAreaTopHeight + size.height;
-        dialogLeftPos = pos.dx + (size.width / 2) - (widget.width / 2);
+        dialogTopPos = getBottomOfWidgetTopPos(
+            pos.dy, size.height, enableArrow ? widget.arrowHeight : 0);
+        dialogLeftPos =
+            getAlignCenterBottomLeftPos(pos.dx, size.width, widget.width);
         arrowTopPos = dialogTopPos! - widget.arrowHeight;
         arrowLeftPos = pos.dx + (size.width / 2) - (widget.arrowWidth / 2);
         arrowPointing = ArrowPointing.top;
 
-        //Prevent dialog overflow to right
-        if (dialogLeftPos! + widget.width > widget.screenWidth) {
-          dialogLeftPos = widget.screenWidth - widget.width - 5;
-        }
+        dialogLeftPos = preventHorizontalOverflow(dialogLeftPos!, widget.width);
 
         break;
       case AlignTargetWidget.topCenter:
         dialogTopPos =
             pos.dy - safeAreaTopHeight - widget.height - widget.arrowHeight;
-        dialogLeftPos = pos.dx + (size.width / 2) - (widget.width / 2);
+        dialogTopPos =
+            getTopOfWidgetTopPos(pos.dy, widget.height, enableArrow ? widget.arrowHeight : 0);
+        dialogLeftPos =
+            getAlignCenterBottomLeftPos(pos.dx, size.width, widget.width);
         arrowTopPos = dialogTopPos! + widget.height;
         arrowLeftPos = pos.dx + (size.width / 2) - (widget.arrowWidth / 2);
         arrowPointing = ArrowPointing.bottom;
 
         //Prevent dialog overflow to right
-        if (dialogLeftPos! + widget.width > widget.screenWidth) {
-          dialogLeftPos = widget.screenWidth - widget.width - 5;
-        }
+        dialogLeftPos = preventHorizontalOverflow(dialogLeftPos!, widget.width);
 
         break;
       case AlignTargetWidget.right || AlignTargetWidget.rightCenter:
         dialogLeftPos = getAlignRightPos(
             pos.dx, size.width, enableArrow == true ? widget.arrowHeight : 0);
-        dialogTopPos = getCenterTopPos(widget.height);
+        dialogTopPos = getCenterOfScreenTopPos(widget.height);
 
         if (alignment == AlignTargetWidget.rightCenter) {
           dialogTopPos =
@@ -191,7 +193,7 @@ class _CustomDialogState extends State<CustomDialog> {
       case AlignTargetWidget.left || AlignTargetWidget.leftCenter:
         dialogLeftPos = getAlignLeftPos(
             pos.dx, enableArrow ? widget.arrowHeight : 0, widget.width);
-        dialogTopPos = getCenterTopPos(widget.height);
+        dialogTopPos = getCenterOfScreenTopPos(widget.height);
 
         if (alignment == AlignTargetWidget.leftCenter) {
           dialogTopPos =
@@ -217,7 +219,7 @@ class _CustomDialogState extends State<CustomDialog> {
           dialogLeftPos =
               preventHorizontalOverflow(dialogLeftPos!, widget.width);
           arrowLeftPos = dialogLeftPos! - widget.arrowHeight;
-        } 
+        }
 
         break;
 
@@ -390,7 +392,8 @@ class _CustomDialogState extends State<CustomDialog> {
 
   double preventVerticalOverflow(double dialogTopPos, double dialogHeight) {
     double newTopPos = dialogTopPos;
-    if ((dialogTopPos + dialogHeight) >= widget.screenHeight - widget.safeAreaTopHeight) {
+    if ((dialogTopPos + dialogHeight) >=
+        widget.screenHeight - widget.safeAreaTopHeight) {
       newTopPos =
           widget.screenHeight - widget.height - widget.safeAreaTopHeight - 20;
     }
@@ -406,7 +409,7 @@ class _CustomDialogState extends State<CustomDialog> {
     if (dialogLeftPos < 5) {
       newLeftPos = 5;
     }
-    if (dialogLeftPos +dialogWidth  > widget.screenWidth - 5) {
+    if (dialogLeftPos + dialogWidth > widget.screenWidth - 5) {
       newLeftPos = widget.screenWidth - dialogWidth - 5;
     }
 
@@ -415,15 +418,39 @@ class _CustomDialogState extends State<CustomDialog> {
 
   double getAlignRightPos(
       double targetBoxXpos, double targetBoxWidth, double space) {
-    return targetBoxWidth + targetBoxXpos + space;
+    return (targetBoxWidth + targetBoxXpos + space) +
+        widget.distanceBetweenTargetWidget;
   }
 
   double getAlignLeftPos(
       double targetBoxXpos, double arrowWidth, double space) {
-    return targetBoxXpos - space - arrowWidth;
+    return (targetBoxXpos - space - arrowWidth) -
+        widget.distanceBetweenTargetWidget;
   }
 
-  double getCenterTopPos(double dialogHeight) {
+  double getAlignCenterBottomLeftPos(
+      double targetBoxXpos, double targetBoxWidth, double dialogWidth) {
+    return targetBoxXpos + (targetBoxWidth / 2) - (dialogWidth / 2);
+  }
+
+  double getBottomOfWidgetTopPos(
+      double targetBoxYpos, double targetBoxHeight, double arrowHeight) {
+    return (targetBoxYpos -
+            widget.safeAreaTopHeight +
+            targetBoxHeight +
+            arrowHeight) +
+        widget.distanceBetweenTargetWidget;
+  }
+
+  double getTopOfWidgetTopPos(
+      double targetBoxYpos, double dialogHeight, double arrowHeight) {
+    return targetBoxYpos -
+        widget.safeAreaTopHeight -
+        dialogHeight -
+        arrowHeight - widget.distanceBetweenTargetWidget;
+  }
+
+  double getCenterOfScreenTopPos(double dialogHeight) {
     return (widget.screenHeight / 2) -
         (dialogHeight / 2) -
         widget.safeAreaTopHeight;
