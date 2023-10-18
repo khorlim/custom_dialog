@@ -435,8 +435,8 @@ class _CustomDialogState extends State<CustomDialog> {
 
   double getBottomOfWidgetTopPos(
       double targetBoxYpos, double targetBoxHeight, double arrowHeight) {
-    return (targetBoxYpos -
-            widget.safeAreaTopHeight +
+    return ((targetBoxYpos -
+            widget.safeAreaTopHeight) +
             targetBoxHeight +
             arrowHeight) +
         widget.distanceBetweenTargetWidget;
