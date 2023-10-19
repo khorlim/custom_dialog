@@ -89,7 +89,7 @@ class _CustomDialogState extends State<CustomDialog> {
       addAdjustment(widget.alignTargetWidget, widget.adjustment);
 
       //follow arrow
-      if (widget.followArrow) {
+      if (widget.followArrow && widget.alignTargetWidget != AlignTargetWidget.bottomCenter && widget.alignTargetWidget != AlignTargetWidget.bottomLeft) {
         if (dialogTopPos! >= arrowTopPos!) {
           dialogTopPos = arrowTopPos! - widget.arrowWidth;
         }
