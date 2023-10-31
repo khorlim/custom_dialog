@@ -89,7 +89,9 @@ class _CustomDialogState extends State<CustomDialog> {
       addAdjustment(widget.alignTargetWidget, widget.adjustment);
 
       //follow arrow
-      if (widget.followArrow && widget.alignTargetWidget != AlignTargetWidget.bottomCenter && widget.alignTargetWidget != AlignTargetWidget.bottomLeft) {
+      if (widget.followArrow &&
+          widget.alignTargetWidget != AlignTargetWidget.bottomCenter &&
+          widget.alignTargetWidget != AlignTargetWidget.bottomLeft) {
         if (dialogTopPos! >= arrowTopPos!) {
           dialogTopPos = arrowTopPos! - widget.arrowWidth;
         }
@@ -136,8 +138,8 @@ class _CustomDialogState extends State<CustomDialog> {
       case AlignTargetWidget.topCenter:
         dialogTopPos =
             pos.dy - safeAreaTopHeight - widget.height - widget.arrowHeight;
-        dialogTopPos =
-            getTopOfWidgetTopPos(pos.dy, widget.height, enableArrow ? widget.arrowHeight : 0);
+        dialogTopPos = getTopOfWidgetTopPos(
+            pos.dy, widget.height, enableArrow ? widget.arrowHeight : 0);
         dialogLeftPos =
             getAlignCenterBottomLeftPos(pos.dx, size.width, widget.width);
         arrowTopPos = dialogTopPos! + widget.height;
@@ -435,8 +437,7 @@ class _CustomDialogState extends State<CustomDialog> {
 
   double getBottomOfWidgetTopPos(
       double targetBoxYpos, double targetBoxHeight, double arrowHeight) {
-    return ((targetBoxYpos -
-            widget.safeAreaTopHeight) +
+    return ((targetBoxYpos - widget.safeAreaTopHeight) +
             targetBoxHeight +
             arrowHeight) +
         widget.distanceBetweenTargetWidget;
@@ -447,7 +448,8 @@ class _CustomDialogState extends State<CustomDialog> {
     return targetBoxYpos -
         widget.safeAreaTopHeight -
         dialogHeight -
-        arrowHeight - widget.distanceBetweenTargetWidget;
+        arrowHeight -
+        widget.distanceBetweenTargetWidget;
   }
 
   double getCenterOfScreenTopPos(double dialogHeight) {
