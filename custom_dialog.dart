@@ -102,7 +102,14 @@ class _CustomDialogState extends State<CustomDialog> {
           dialogTopPos = arrowTopPos! - widget.height + widget.arrowWidth + 5;
         }
 
-        dialogTopPos = preventVerticalOverflow(dialogTopPos!, widget.height);
+        if (dialogTopPos! < 5) {
+          alignTargetWidget = AlignTargetWidget.right;
+          calculatePos(
+              size: widgetBoxSize,
+              pos: targetWidgetPos,
+              alignment: alignTargetWidget,
+              safeAreaTopHeight: widget.safeAreaTopHeight);
+        }
       }
 
       //if show overflow arrow = false
