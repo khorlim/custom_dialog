@@ -99,6 +99,8 @@ class _CustomDialogState extends State<CustomDialog> {
             (dialogTopPos! + widget.height)) {
           dialogTopPos = arrowTopPos! - widget.height + widget.arrowWidth + 5;
         }
+
+        dialogTopPos = preventVerticalOverflow(dialogTopPos!, widget.height);
       }
 
       //if show overflow arrow = false
