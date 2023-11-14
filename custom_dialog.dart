@@ -65,12 +65,14 @@ class CustomDialog extends StatefulWidget {
 }
 
 class _CustomDialogState extends State<CustomDialog> {
+  late AlignTargetWidget alignTargetWidget;
   ArrowPointing arrowPointing = ArrowPointing.left;
   bool enableArrow = false;
 
   @override
   void initState() {
     super.initState;
+    alignTargetWidget = widget.alignTargetWidget;
     //Get essential data to calculate position yes
     enableArrow = widget.enableArrow;
     RenderBox? targetWidgetRBox =
@@ -83,15 +85,15 @@ class _CustomDialogState extends State<CustomDialog> {
       calculatePos(
           size: widgetBoxSize!,
           pos: targetWidgetPos!,
-          alignment: widget.alignTargetWidget,
+          alignment: alignTargetWidget,
           safeAreaTopHeight: widget.safeAreaTopHeight);
 
-      addAdjustment(widget.alignTargetWidget, widget.adjustment);
+      addAdjustment(alignTargetWidget, widget.adjustment);
 
       //follow arrow
       if (widget.followArrow &&
-          widget.alignTargetWidget != AlignTargetWidget.bottomCenter &&
-          widget.alignTargetWidget != AlignTargetWidget.bottomLeft) {
+          alignTargetWidget != AlignTargetWidget.bottomCenter &&
+          alignTargetWidget != AlignTargetWidget.bottomLeft) {
         if (dialogTopPos! >= arrowTopPos!) {
           dialogTopPos = arrowTopPos! - widget.arrowWidth;
         }
@@ -150,6 +152,15 @@ class _CustomDialogState extends State<CustomDialog> {
 
         //Prevent dialog overflow to right
         dialogLeftPos = preventHorizontalOverflow(dialogLeftPos!, widget.width);
+
+        if (dialogTopPos! < 10) {
+          alignTargetWidget = AlignTargetWidget.right;
+          calculatePos(
+              size: size,
+              pos: pos,
+              alignment: alignTargetWidget,
+              safeAreaTopHeight: widget.safeAreaTopHeight);
+        }
 
         break;
       case AlignTargetWidget.right || AlignTargetWidget.rightCenter:
