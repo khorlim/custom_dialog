@@ -103,7 +103,7 @@ class _CustomDialogState extends State<CustomDialog> {
         }
 
         if (dialogTopPos! < 5) {
-          alignTargetWidget = AlignTargetWidget.right;
+          alignTargetWidget = AlignTargetWidget.bottomCenter;
           calculatePos(
               size: widgetBoxSize,
               pos: targetWidgetPos,
