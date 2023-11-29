@@ -93,7 +93,8 @@ class _CustomDialogState extends State<CustomDialog> {
       //follow arrow
       if (widget.followArrow &&
           alignTargetWidget != AlignTargetWidget.bottomCenter &&
-          alignTargetWidget != AlignTargetWidget.bottomLeft) {
+          alignTargetWidget != AlignTargetWidget.bottomLeft &&
+          alignTargetWidget != AlignTargetWidget.topCenter) {
         if (dialogTopPos! >= arrowTopPos!) {
           dialogTopPos = arrowTopPos! - widget.arrowWidth;
         }
