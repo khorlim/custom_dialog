@@ -43,34 +43,34 @@ class TestingCustomDialog extends StatelessWidget {
                   width: 300,
                   color: Colors.blue.withOpacity(0.5),
                   child: Center(
-                    child: Builder(
-                      builder: (ctxt) {
-                        return GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                  context: bigContext,
-                                  builder: (context) {
-                                    return CustomDialog(
-                                        context: bigContext,
-                                        height: 400,
-                                        width: 500,
-                                        targetWidgetContext: ctxt,
-                                        enableArrow: true,
-                                        distanceBetweenTargetWidget:0,
+                    child: Builder(builder: (ctxt) {
+                      return GestureDetector(
+                          onTap: () {
+                            showDialog(
+                                context: bigContext,
+                                builder: (context) {
+                                  return CustomDialog(
+                                      context: bigContext,
+                                      height: 400,
+                                      width: 500,
+                                      targetWidgetContext: ctxt,
+                                      enableArrow: true,
+                                      followArrow: true,
+                                      distanceBetweenTargetWidget: 0,
                                       // showOverFlowArrow: false,
-                                        alignTargetWidget: AlignTargetWidget.bottomCenter,
-                                        child: Container(
-                                          color: Colors.green,
-                                        ));
-                                  });
-                            },
-                            child: Container(
+                                      alignTargetWidget:
+                                          AlignTargetWidget.bottomCenter,
+                                      child: Container(
+                                        color: Colors.green,
+                                      ));
+                                });
+                          },
+                          child: Container(
                               width: 100,
                               height: 100,
                               color: Colors.orange,
                               child: Text('test')));
-                      }
-                    ),
+                    }),
                   ),
                 ),
               ),
