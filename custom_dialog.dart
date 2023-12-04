@@ -328,7 +328,7 @@ class _CustomDialogState extends State<CustomDialog> {
           } else {
             if (widget.pushDialogAboveWhenKeyboardShow) {
               Future.delayed(Duration(milliseconds: 200), () {
-                enableArrow = true;
+                enableArrow = widget.targetWidgetContext != null ? true : false;
               });
             }
             widget.dialogHeight = widget.height;
