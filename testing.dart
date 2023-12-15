@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import '../timesheet/custom_widget/free_scroll_view.dart';
+import 'package:tunaipro/general_module/timesheet_module/custom_widget/free_scroll_view.dart';
 import 'custom_dialog.dart';
 
 class TestingCustomDialog extends StatelessWidget {
