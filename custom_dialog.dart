@@ -45,18 +45,10 @@ class CustomDialog extends StatefulWidget {
     this.followArrow = false,
     this.distanceBetweenTargetWidget = 0,
   }) {
-    screenHeight = MediaQuery.of(context).size.height;
-    screenWidth = MediaQuery.of(context).size.width;
     safeAreaTopHeight = MediaQueryData.fromView(ui.window).padding.top;
-    dialogHeight = height ?? (screenHeight * 0.78);
-    dialogWidth = width ?? (screenWidth * 0.35);
   }
 
-  late final double screenHeight;
-  late final double screenWidth;
   late final double safeAreaTopHeight;
-  late final double dialogWidth;
-  late double dialogHeight;
 
   @override
   State<CustomDialog> createState() => _CustomDialogState();
@@ -67,17 +59,22 @@ class _CustomDialogState extends State<CustomDialog> {
   ArrowPointing arrowPointing = ArrowPointing.left;
   bool enableArrow = false;
 
-  late double dialogHeight = widget.dialogHeight;
-  late double dialogWidth = widget.dialogWidth;
-  late double oriHeight = widget.dialogHeight;
+  late double dialogHeight;
+  late double dialogWidth;
+  late double oriHeight;
 
-  late double screenHeight = widget.screenHeight;
-  late double screenWidth = widget.screenWidth;
+  late double screenHeight;
+  late double screenWidth;
 
   void updateDialogPos({double? old}) {
     alignTargetWidget = widget.alignTargetWidget;
     //Get essential data to calculate position yes
     enableArrow = widget.enableArrow;
+    if (widget.targetWidgetContext != null &&
+        !widget.targetWidgetContext!.mounted) {
+      // Navigator.pop(context);
+      return;
+    }
     RenderBox? targetWidgetRBox =
         widget.targetWidgetContext?.findRenderObject() as RenderBox?;
 
@@ -153,7 +150,8 @@ class _CustomDialogState extends State<CustomDialog> {
   @override
   void initState() {
     super.initState;
-
+    screenHeight = MediaQuery.of(widget.context).size.height;
+    screenWidth = MediaQuery.of(widget.context).size.width;
     oldOrientation = MediaQuery.of(widget.context).orientation;
     getDialogHeight(oldOrientation);
     getDialogWidth(oldOrientation);
