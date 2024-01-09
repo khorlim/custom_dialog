@@ -1,8 +1,4 @@
-import 'dart:math';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:tunaipro/share_code/keyboard_size_provider/keyboard_size_provider.dart';
 import 'dart:ui' as ui;
 import 'triangle.dart';
@@ -11,8 +7,8 @@ part 'enum.dart';
 
 class CustomDialog extends StatefulWidget {
   final BuildContext context;
-  final double height;
-  final double width;
+  final double? height;
+  final double? width;
   final Widget? appBar;
   final Widget child;
   final BuildContext? targetWidgetContext;
@@ -33,8 +29,8 @@ class CustomDialog extends StatefulWidget {
     required this.context,
     required this.child,
     this.appBar,
-    this.width = 400,
-    this.height = 650,
+    this.width,
+    this.height,
     this.alignTargetWidget = AlignTargetWidget.right,
     this.enableArrow = false,
     this.arrowWidth = 30,
@@ -48,16 +44,19 @@ class CustomDialog extends StatefulWidget {
     this.pushDialogAboveWhenKeyboardShow = false,
     this.followArrow = false,
     this.distanceBetweenTargetWidget = 0,
-  })  : dialogHeight = height,
-        screenHeight = MediaQuery.of(context).size.height,
-        screenWidth = MediaQuery.of(context).size.width,
-        safeAreaTopHeight = MediaQueryData.fromView(ui.window).padding.top;
+  }) {
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
+    safeAreaTopHeight = MediaQueryData.fromView(ui.window).padding.top;
+    dialogHeight = height ?? (screenHeight * 0.78);
+    dialogWidth = width ?? (screenWidth * 0.35);
+  }
 
-  final double screenHeight;
-  final double screenWidth;
-  final double safeAreaTopHeight;
-
-  double dialogHeight;
+  late final double screenHeight;
+  late final double screenWidth;
+  late final double safeAreaTopHeight;
+  late final double dialogWidth;
+  late double dialogHeight;
 
   @override
   State<CustomDialog> createState() => _CustomDialogState();
@@ -68,9 +67,14 @@ class _CustomDialogState extends State<CustomDialog> {
   ArrowPointing arrowPointing = ArrowPointing.left;
   bool enableArrow = false;
 
-  @override
-  void initState() {
-    super.initState;
+  late double dialogHeight = widget.dialogHeight;
+  late double dialogWidth = widget.dialogWidth;
+  late double oriHeight = widget.dialogHeight;
+
+  late double screenHeight = widget.screenHeight;
+  late double screenWidth = widget.screenWidth;
+
+  void updateDialogPos({double? old}) {
     alignTargetWidget = widget.alignTargetWidget;
     //Get essential data to calculate position yes
     enableArrow = widget.enableArrow;
@@ -79,6 +83,7 @@ class _CustomDialogState extends State<CustomDialog> {
 
     Size? widgetBoxSize = targetWidgetRBox?.size;
     Offset? targetWidgetPos = targetWidgetRBox?.localToGlobal(Offset.zero);
+
     bool arrowOverflowed = false;
     if (targetWidgetRBox != null) {
       calculatePos(
@@ -97,9 +102,8 @@ class _CustomDialogState extends State<CustomDialog> {
         if (dialogTopPos! >= arrowTopPos!) {
           dialogTopPos = arrowTopPos! - widget.arrowWidth;
         }
-        if ((arrowTopPos! + widget.arrowWidth) >=
-            (dialogTopPos! + widget.height)) {
-          dialogTopPos = arrowTopPos! - widget.height + widget.arrowWidth + 5;
+        if ((arrowTopPos! + widget.arrowWidth) >= (dialogTopPos! + oriHeight)) {
+          dialogTopPos = arrowTopPos! - oriHeight + widget.arrowWidth + 5;
         }
 
         if (dialogTopPos! < 5) {
@@ -110,21 +114,62 @@ class _CustomDialogState extends State<CustomDialog> {
               alignment: alignTargetWidget,
               safeAreaTopHeight: widget.safeAreaTopHeight);
         }
+        dialogTopPos = preventVerticalOverflow(dialogTopPos!, oriHeight);
       }
 
       //if show overflow arrow = false
       arrowOverflowed = arrowTopPos! <= (dialogTopPos! + 5) ||
-          arrowTopPos! + widget.arrowWidth >=
-              (dialogTopPos! + widget.height - 5);
+          arrowTopPos! + widget.arrowWidth >= (dialogTopPos! + oriHeight - 5);
       if (!widget.showOverFlowArrow && arrowOverflowed) {
         enableArrow = false;
       }
     } else {
       //Default toppos is middle
-      dialogTopPos = (widget.screenHeight / 2) -
-          (widget.height / 2) -
-          widget.safeAreaTopHeight;
+      dialogTopPos =
+          (screenHeight / 2) - (oriHeight / 2) - widget.safeAreaTopHeight;
     }
+    if (mounted) {
+      if (old != null && dialogLeftPos != old) {
+        Future.delayed(Duration(milliseconds: 100), () {
+          setState(() {});
+        });
+      }
+    }
+  }
+
+  void getDialogHeight(Orientation orientation) {
+    double height =
+        screenHeight * (orientation == Orientation.landscape ? 0.78 : 0.55);
+    dialogHeight = widget.height ?? height;
+    oriHeight = dialogHeight;
+  }
+
+  void getDialogWidth(Orientation orientation) {
+    double width =
+        screenWidth * (orientation == Orientation.landscape ? 0.35 : 0.47);
+    dialogWidth = widget.width ?? width;
+  }
+
+  @override
+  void initState() {
+    super.initState;
+
+    oldOrientation = MediaQuery.of(widget.context).orientation;
+    getDialogHeight(oldOrientation);
+    getDialogWidth(oldOrientation);
+    updateDialogPos();
+  }
+
+  @override
+  void didUpdateWidget(covariant CustomDialog oldWidget) {
+    updateDialogPos(old: dialogLeftPos);
+
+    Future.delayed(Duration(milliseconds: 400), () {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+    super.didUpdateWidget(oldWidget);
   }
 
   void calculatePos({
@@ -138,27 +183,27 @@ class _CustomDialogState extends State<CustomDialog> {
         dialogTopPos = getBottomOfWidgetTopPos(
             pos.dy, size.height, enableArrow ? widget.arrowHeight : 0);
         dialogLeftPos =
-            getAlignCenterBottomLeftPos(pos.dx, size.width, widget.width);
+            getAlignCenterBottomLeftPos(pos.dx, size.width, dialogWidth);
         arrowTopPos = dialogTopPos! - widget.arrowHeight;
         arrowLeftPos = pos.dx + (size.width / 2) - (widget.arrowWidth / 2);
         arrowPointing = ArrowPointing.top;
 
-        dialogLeftPos = preventHorizontalOverflow(dialogLeftPos!, widget.width);
+        dialogLeftPos = preventHorizontalOverflow(dialogLeftPos!, dialogWidth);
 
         break;
       case AlignTargetWidget.topCenter:
         dialogTopPos =
-            pos.dy - safeAreaTopHeight - widget.height - widget.arrowHeight;
+            pos.dy - safeAreaTopHeight - oriHeight - widget.arrowHeight;
         dialogTopPos = getTopOfWidgetTopPos(
-            pos.dy, widget.height, enableArrow ? widget.arrowHeight : 0);
+            pos.dy, oriHeight, enableArrow ? widget.arrowHeight : 0);
         dialogLeftPos =
-            getAlignCenterBottomLeftPos(pos.dx, size.width, widget.width);
-        arrowTopPos = dialogTopPos! + widget.height;
+            getAlignCenterBottomLeftPos(pos.dx, size.width, dialogWidth);
+        arrowTopPos = dialogTopPos! + oriHeight;
         arrowLeftPos = pos.dx + (size.width / 2) - (widget.arrowWidth / 2);
         arrowPointing = ArrowPointing.bottom;
 
         //Prevent dialog overflow to right
-        dialogLeftPos = preventHorizontalOverflow(dialogLeftPos!, widget.width);
+        dialogLeftPos = preventHorizontalOverflow(dialogLeftPos!, dialogWidth);
 
         if (dialogTopPos! < 10) {
           alignTargetWidget = AlignTargetWidget.right;
@@ -173,12 +218,12 @@ class _CustomDialogState extends State<CustomDialog> {
       case AlignTargetWidget.right || AlignTargetWidget.rightCenter:
         dialogLeftPos = getAlignRightPos(
             pos.dx, size.width, enableArrow == true ? widget.arrowHeight : 0);
-        dialogTopPos = getCenterOfScreenTopPos(widget.height);
+        dialogTopPos = getCenterOfScreenTopPos(oriHeight);
 
         if (alignment == AlignTargetWidget.rightCenter) {
           dialogTopPos =
-              getCenterOfWidgetTopPos(pos.dy, size.height, widget.height);
-          dialogTopPos = preventVerticalOverflow(dialogTopPos!, widget.height);
+              getCenterOfWidgetTopPos(pos.dy, size.height, oriHeight);
+          dialogTopPos = preventVerticalOverflow(dialogTopPos!, oriHeight);
         }
 
         arrowTopPos = (pos.dy - safeAreaTopHeight) +
@@ -188,20 +233,20 @@ class _CustomDialogState extends State<CustomDialog> {
         arrowPointing = ArrowPointing.left;
 
         //If dialog exceed right screen
-        if (dialogLeftPos! + widget.width >= widget.screenWidth) {
+        if (dialogLeftPos! + dialogWidth >= screenWidth) {
           if (widget.jumpWhenOverflow) {
             //Move the dialog to left
             dialogLeftPos = getAlignLeftPos(
-                pos.dx, enableArrow ? widget.arrowHeight : 0, widget.width);
+                pos.dx, enableArrow ? widget.arrowHeight : 0, dialogWidth);
             arrowLeftPos = pos.dx - widget.arrowHeight;
             arrowPointing = ArrowPointing.right;
             dialogLeftPos =
-                preventHorizontalOverflow(dialogLeftPos!, widget.width);
-            arrowLeftPos = dialogLeftPos! + widget.width;
+                preventHorizontalOverflow(dialogLeftPos!, dialogWidth);
+            arrowLeftPos = dialogLeftPos! + dialogWidth;
           } else {
             //Keep the dialog to right but move it to left abit
             dialogLeftPos =
-                preventHorizontalOverflow(dialogLeftPos!, widget.width);
+                preventHorizontalOverflow(dialogLeftPos!, dialogWidth);
             arrowLeftPos = dialogLeftPos! - widget.arrowHeight;
           }
         } else if (dialogLeftPos! < widget.overflowLeft) {
@@ -214,19 +259,19 @@ class _CustomDialogState extends State<CustomDialog> {
 
       case AlignTargetWidget.left || AlignTargetWidget.leftCenter:
         dialogLeftPos = getAlignLeftPos(
-            pos.dx, enableArrow ? widget.arrowHeight : 0, widget.width);
-        dialogTopPos = getCenterOfScreenTopPos(widget.height);
+            pos.dx, enableArrow ? widget.arrowHeight : 0, dialogWidth);
+        dialogTopPos = getCenterOfScreenTopPos(oriHeight);
 
         if (alignment == AlignTargetWidget.leftCenter) {
           dialogTopPos =
-              getCenterOfWidgetTopPos(pos.dy, size.height, widget.height);
-          dialogTopPos = preventVerticalOverflow(dialogTopPos!, widget.height);
+              getCenterOfWidgetTopPos(pos.dy, size.height, oriHeight);
+          dialogTopPos = preventVerticalOverflow(dialogTopPos!, oriHeight);
         }
 
         arrowTopPos = (pos.dy - safeAreaTopHeight) +
             (size.height / 2) -
             (widget.arrowWidth / 2);
-        arrowLeftPos = dialogLeftPos! + widget.width;
+        arrowLeftPos = dialogLeftPos! + dialogWidth;
         arrowPointing = ArrowPointing.right;
 
         //Prevent dialog overflow
@@ -239,7 +284,7 @@ class _CustomDialogState extends State<CustomDialog> {
 
           //if jump to right still oveflow stay right but move to left
           dialogLeftPos =
-              preventHorizontalOverflow(dialogLeftPos!, widget.width);
+              preventHorizontalOverflow(dialogLeftPos!, dialogWidth);
           arrowLeftPos = dialogLeftPos! - widget.arrowHeight;
         }
 
@@ -247,14 +292,14 @@ class _CustomDialogState extends State<CustomDialog> {
 
       case AlignTargetWidget.bottomLeft:
         dialogTopPos = pos.dy - safeAreaTopHeight + size.height;
-        dialogLeftPos = pos.dx - widget.width + size.width;
+        dialogLeftPos = pos.dx - dialogWidth + size.width;
         arrowTopPos = dialogTopPos! - widget.arrowHeight;
         arrowLeftPos = pos.dx + (size.width / 2) - (widget.arrowWidth / 2);
         arrowPointing = ArrowPointing.top;
 
         //Prevent dialog overflow to right
-        if (dialogLeftPos! + widget.width > widget.screenWidth) {
-          dialogLeftPos = widget.screenWidth - widget.width - 5;
+        if (dialogLeftPos! + dialogWidth > screenWidth) {
+          dialogLeftPos = screenWidth - dialogWidth - 5;
         } else if (dialogLeftPos! < 5) {
           //Prevent dialog overflow to left
           dialogLeftPos = 5;
@@ -304,127 +349,144 @@ class _CustomDialogState extends State<CustomDialog> {
   double? arrowTopPos;
   double? arrowLeftPos;
 
+  late Orientation oldOrientation;
+
   @override
   Widget build(BuildContext context) {
-    return KeyboardSizeProvider(
-      child: SafeArea(
-        child: Consumer<ScreenHeight>(builder: (context, screenHeight, child) {
-          bool isKeyboardVisible = screenHeight.isOpen;
-          double paddingWhenKeyboardShow = screenHeight.keyboardHeight;
-          return LayoutBuilder(builder: (context, constraints) {
-            if (isKeyboardVisible) {
-              double screenHeight = constraints.maxHeight;
+    screenHeight = MediaQuery.of(context).size.height;
+    screenWidth = MediaQuery.of(context).size.width;
+    // print('rebuilding');
+    return OrientationBuilder(builder: (context, orientation) {
+      getDialogHeight(orientation);
+      getDialogWidth(orientation);
 
-              double newHeight = widget.height -
-                  (paddingWhenKeyboardShow -
-                      (screenHeight - (widget.height + dialogTopPos!)));
+      updateDialogPos(old: dialogLeftPos);
+      oldOrientation = orientation;
+      if (oldOrientation != orientation) {}
+      return KeyboardSizeProvider(
+        child: SafeArea(
+          child:
+              Consumer<ScreenHeight>(builder: (context, screenHeight, child) {
+            bool isKeyboardVisible = screenHeight.isOpen;
+            double paddingWhenKeyboardShow = screenHeight.keyboardHeight;
+            return LayoutBuilder(builder: (context, constraints) {
+              if (isKeyboardVisible) {
+                double screenHeight = constraints.maxHeight;
 
-              if (widget.pushDialogAboveWhenKeyboardShow) {
-                newHeight = widget.height -
+                double newHeight = oriHeight -
                     (paddingWhenKeyboardShow -
-                        (screenHeight - (widget.height + 10)));
-                enableArrow = false;
-              }
+                        (screenHeight - (oriHeight + dialogTopPos!)));
 
-              widget.dialogHeight =
-                  newHeight > 0 ? newHeight - 5 : widget.height;
-            } else {
-              if (widget.pushDialogAboveWhenKeyboardShow) {
-                Future.delayed(Duration(milliseconds: 200), () {
-                  enableArrow =
-                      widget.targetWidgetContext != null ? true : false;
-                });
+                if (widget.pushDialogAboveWhenKeyboardShow) {
+                  newHeight = oriHeight -
+                      (paddingWhenKeyboardShow -
+                          (screenHeight - (oriHeight + 10)));
+                  enableArrow = false;
+                }
+
+                dialogHeight = newHeight > 0 ? newHeight - 5 : oriHeight;
+              } else {
+                if (widget.pushDialogAboveWhenKeyboardShow) {
+                  Future.delayed(Duration(milliseconds: 200), () {
+                    enableArrow =
+                        widget.targetWidgetContext != null ? true : false;
+                  });
+                }
+                dialogHeight = oriHeight;
               }
-              widget.dialogHeight = widget.height;
-            }
-            return Stack(
-              alignment: Alignment.center,
-              children: [
-                GestureDetector(
-                  onTap: widget.onTapOutside != null
-                      ? () => widget.onTapOutside?.call()
-                      : () {
-                          Navigator.pop(context);
-                        },
-                ),
-                AnimatedPositioned(
-                  duration: Duration(milliseconds: 300),
-                  top: isKeyboardVisible &&
-                          widget.pushDialogAboveWhenKeyboardShow
-                      ? 10
-                      : dialogTopPos,
-                  left: dialogLeftPos,
-                  child: Material(
-                    clipBehavior: Clip.antiAlias,
-                    elevation: 5,
-                    shadowColor: Colors.grey.withOpacity(0.3),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Container(
-                      clipBehavior: Clip.antiAlias,
-                      padding: EdgeInsets.zero,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.1),
-                              spreadRadius: 2,
-                              blurRadius: 10,
-                              offset: Offset(0, -2),
-                            ),
-                          ]),
-                      height: widget.dialogHeight,
-                      width: widget.width,
-                      child: Column(
-                        children: [
-                          widget.appBar ?? Container(),
-                          Expanded(child: widget.child),
-                        ],
-                      ),
-                    ),
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: widget.onTapOutside != null
+                        ? () => widget.onTapOutside?.call()
+                        : () {
+                            Navigator.pop(context);
+                          },
                   ),
-                ),
-                if (enableArrow)
-                  Positioned(
-                    top: arrowTopPos,
-                    left: arrowLeftPos,
-                    child: PhysicalModel(
-                      color: Colors.transparent,
-                      elevation: 3,
-                      shadowColor: Colors.grey.withOpacity(0.06),
-                      shape: BoxShape.circle,
-                      child: CustomPaint(
-                        painter: _getArrowPainter(arrowPointing),
-                        child: Container(
-                          width: arrowPointing == ArrowPointing.top ||
-                                  arrowPointing == ArrowPointing.bottom
-                              ? widget.arrowWidth
-                              : widget.arrowHeight,
-                          height: arrowPointing == ArrowPointing.top ||
-                                  arrowPointing == ArrowPointing.bottom
-                              ? widget.arrowHeight
-                              : widget.arrowWidth,
+                  AnimatedPositioned(
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    top: isKeyboardVisible &&
+                            widget.pushDialogAboveWhenKeyboardShow
+                        ? 10
+                        : dialogTopPos,
+                    left: dialogLeftPos,
+                    child: Material(
+                      clipBehavior: Clip.antiAlias,
+                      elevation: 5,
+                      shadowColor: Colors.grey.withOpacity(0.3),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
+                        clipBehavior: Clip.antiAlias,
+                        padding: EdgeInsets.zero,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(10),
+                                bottomRight: Radius.circular(10)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.1),
+                                spreadRadius: 2,
+                                blurRadius: 10,
+                                offset: Offset(0, -2),
+                              ),
+                            ]),
+                        height: dialogHeight,
+                        width: dialogWidth,
+                        child: Column(
+                          children: [
+                            widget.appBar ?? Container(),
+                            Expanded(child: widget.child),
+                          ],
                         ),
                       ),
                     ),
-                  )
-              ],
-            );
-          });
-        }),
-      ),
-    );
+                  ),
+                  if (enableArrow)
+                    AnimatedPositioned(
+                      duration: Duration(milliseconds: 200),
+                      curve: Curves.easeInOut,
+                      top: arrowTopPos,
+                      left: arrowLeftPos,
+                      child: PhysicalModel(
+                        color: Colors.transparent,
+                        elevation: 3,
+                        shadowColor: Colors.grey.withOpacity(0.06),
+                        shape: BoxShape.circle,
+                        child: CustomPaint(
+                          painter: _getArrowPainter(arrowPointing),
+                          child: Container(
+                            width: arrowPointing == ArrowPointing.top ||
+                                    arrowPointing == ArrowPointing.bottom
+                                ? widget.arrowWidth
+                                : widget.arrowHeight,
+                            height: arrowPointing == ArrowPointing.top ||
+                                    arrowPointing == ArrowPointing.bottom
+                                ? widget.arrowHeight
+                                : widget.arrowWidth,
+                          ),
+                        ),
+                      ),
+                    )
+                ],
+              );
+            });
+          }),
+        ),
+      );
+    });
   }
 
   double preventVerticalOverflow(double dialogTopPos, double dialogHeight) {
     double newTopPos = dialogTopPos;
     if ((dialogTopPos + dialogHeight) >=
-        widget.screenHeight - widget.safeAreaTopHeight) {
-      newTopPos =
-          widget.screenHeight - widget.height - widget.safeAreaTopHeight - 20;
+        screenHeight - widget.safeAreaTopHeight) {
+      newTopPos = screenHeight - oriHeight - widget.safeAreaTopHeight - 20;
     }
     if ((dialogTopPos < 5)) {
       newTopPos = 5;
@@ -438,8 +500,8 @@ class _CustomDialogState extends State<CustomDialog> {
     if (dialogLeftPos < 5) {
       newLeftPos = 5;
     }
-    if (dialogLeftPos + dialogWidth > widget.screenWidth - 5) {
-      newLeftPos = widget.screenWidth - dialogWidth - 5;
+    if (dialogLeftPos + dialogWidth > screenWidth - 5) {
+      newLeftPos = screenWidth - dialogWidth - 5;
     }
 
     return newLeftPos;
@@ -480,9 +542,7 @@ class _CustomDialogState extends State<CustomDialog> {
   }
 
   double getCenterOfScreenTopPos(double dialogHeight) {
-    return (widget.screenHeight / 2) -
-        (dialogHeight / 2) -
-        widget.safeAreaTopHeight;
+    return (screenHeight / 2) - (dialogHeight / 2) - widget.safeAreaTopHeight;
   }
 
   double getCenterOfWidgetTopPos(
