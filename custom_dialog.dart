@@ -24,6 +24,7 @@ class CustomDialog extends StatefulWidget {
   final bool pushDialogAboveWhenKeyboardShow;
   final bool followArrow;
   final double distanceBetweenTargetWidget;
+  final bool adjustSizeWhenKeyboardShow;
 
   CustomDialog({
     required this.context,
@@ -44,6 +45,7 @@ class CustomDialog extends StatefulWidget {
     this.pushDialogAboveWhenKeyboardShow = false,
     this.followArrow = false,
     this.distanceBetweenTargetWidget = 0,
+    this.adjustSizeWhenKeyboardShow = true,
   }) {
     safeAreaTopHeight = MediaQueryData.fromView(ui.window).padding.top;
   }
@@ -127,8 +129,11 @@ class _CustomDialogState extends State<CustomDialog> {
     }
     if (mounted) {
       if (old != null && dialogLeftPos != old) {
+        enableArrow = false;
         Future.delayed(Duration(milliseconds: 100), () {
-          setState(() {});
+          setState(() {
+            enableArrow = true;
+          });
         });
       }
     }
@@ -360,7 +365,9 @@ class _CustomDialogState extends State<CustomDialog> {
 
       updateDialogPos(old: dialogLeftPos);
       oldOrientation = orientation;
-      if (oldOrientation != orientation) {}
+      if (oldOrientation != orientation) {
+        enableArrow = false;
+      }
       return KeyboardSizeProvider(
         child: SafeArea(
           child:
@@ -381,8 +388,9 @@ class _CustomDialogState extends State<CustomDialog> {
                           (screenHeight - (oriHeight + 10)));
                   enableArrow = false;
                 }
-
-                dialogHeight = newHeight > 0 ? newHeight - 5 : oriHeight;
+                if (widget.adjustSizeWhenKeyboardShow) {
+                  dialogHeight = newHeight > 0 ? newHeight - 5 : oriHeight;
+                }
               } else {
                 if (widget.pushDialogAboveWhenKeyboardShow) {
                   Future.delayed(Duration(milliseconds: 200), () {
@@ -418,8 +426,7 @@ class _CustomDialogState extends State<CustomDialog> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: AnimatedContainer(
-                        duration: Duration(milliseconds: 200),
-                        curve: Curves.easeInOut,
+                        duration: Duration(milliseconds: 50),
                         clipBehavior: Clip.antiAlias,
                         padding: EdgeInsets.zero,
                         decoration: BoxDecoration(
