@@ -127,15 +127,15 @@ class _CustomDialogState extends State<CustomDialog> {
       dialogTopPos =
           (screenHeight / 2) - (oriHeight / 2) - widget.safeAreaTopHeight;
     }
-    if (mounted) {
-      if (old != null && dialogLeftPos != old) {
-        enableArrow = false;
-        Future.delayed(Duration(milliseconds: 100), () {
+    if (old != null && dialogLeftPos != old) {
+      enableArrow = false;
+      Future.delayed(Duration(milliseconds: 100), () {
+        if (mounted) {
           setState(() {
             enableArrow = true;
           });
-        });
-      }
+        }
+      });
     }
   }
 
