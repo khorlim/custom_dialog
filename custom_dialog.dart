@@ -389,7 +389,9 @@ class _CustomDialogState extends State<CustomDialog> {
                   enableArrow = false;
                 }
                 if (widget.adjustSizeWhenKeyboardShow) {
-                  dialogHeight = newHeight > 0 ? newHeight - 5 : oriHeight;
+                  if (newHeight <= dialogHeight) {
+                    dialogHeight = newHeight > 0 ? newHeight - 5 : oriHeight;
+                  }
                 }
               } else {
                 if (widget.pushDialogAboveWhenKeyboardShow) {
