@@ -101,18 +101,24 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     double centerDialogHeight = MediaQuery.of(context).size.height * 0.8;
     double centerDialogWidth = MediaQuery.of(context).size.width * 0.8;
 
+    BuildContext? targetCtxt;
+    if (targetWidgetContext != null && targetWidgetContext!.mounted) {
+      targetCtxt = targetWidgetContext;
+    }
+
     Widget dialog = CustomDialog(
       context: context,
       height: height ?? (isCenterDialog ? centerDialogHeight : null),
       width: width ?? (isCenterDialog ? centerDialogWidth : null),
       alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
       enableArrow: enableArrow ?? true,
-      targetWidgetContext: targetWidgetContext,
+      targetWidgetContext: targetCtxt,
       onTapOutside: onTapOutside,
       adjustment: adjustment ?? Offset.zero,
       showOverFlowArrow: showOverFlowArrow ?? true,
       overflowLeft: overflowLeft ?? 0,
       followArrow: followArrow ?? false,
+      pushDialogAboveWhenKeyboardShow: pushDialogAboveWhenKeyboardShow ?? false,
       child: builder(context),
     );
 
