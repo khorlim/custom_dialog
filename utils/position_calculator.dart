@@ -223,7 +223,7 @@ class TopPosCalculator {
 
     //follow target widget
     if (targetWidgetPos.dy <= topPos) {
-      topPos = targetWidgetPos.dy - screenPaddingTop;
+      topPos = targetWidgetPos.dy - screenPaddingTop - 10;
     } else if ((targetWidgetPos.dy + targetWidgetSize.height - 20) >=
         topPos + dialogSize.height) {
       topPos = targetWidgetPos.dy + targetWidgetSize.height - dialogSize.height;
