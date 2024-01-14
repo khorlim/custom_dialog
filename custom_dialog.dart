@@ -74,6 +74,9 @@ class _CustomDialogState extends State<CustomDialog> {
   late double dialogWidth;
   late double oriHeight;
 
+  ValueNotifier<Size> dialogSizeNotifier = ValueNotifier<Size>(Size.zero);
+  ValueNotifier<Size> screenSizeNotifier = ValueNotifier<Size>(Size.zero);
+
   late double screenHeight = MediaQuery.of(widget.context).size.height;
   late double screenWidth = MediaQuery.of(widget.context).size.width;
 
@@ -81,35 +84,18 @@ class _CustomDialogState extends State<CustomDialog> {
   Offset? targetWidgetPos;
   Size? targetWidgetSize;
 
+  ValueNotifier<Offset?> targetWidgetPosNotifier = ValueNotifier<Offset?>(null);
+  ValueNotifier<bool> isKeyboardVisibleNotifier = ValueNotifier<bool>(false);
+
   Offset dialogPos = Offset.zero;
   Offset arrowPos = Offset.zero;
 
-  void updateDialogPos({double? old}) {
-    if (static && targetWidgetPos != null) {
-      return;
-    }
+  late Orientation oldOrientation;
 
-    if (widget.targetWidgetContext != null &&
-        (!widget.targetWidgetContext!.mounted)) {
-      // Navigator.pop(context);
-      setState(() {
-        enableArrow = false;
-      });
-      return;
-    }
-
-    targetWidgetRBox =
-        widget.targetWidgetContext?.findRenderObject() as RenderBox?;
-
-    targetWidgetSize = targetWidgetRBox?.size;
-
-    targetWidgetPos = targetWidgetRBox?.localToGlobal(Offset.zero);
-
-    if (targetWidgetRBox != null) {
-      calculatePos(
-        alignTargetWidget,
-      );
-      calculateArrowPos(alignTargetWidget);
+  void updateDialogPos(BuildContext context, {bool forceCenter = false}) {
+    if (targetWidgetRBox != null && !forceCenter) {
+      calculatePos(alignTargetWidget, context);
+      calculateArrowPos(alignTargetWidget, context);
     } else {
       //Default position (center)
       enableArrow = false;
@@ -118,20 +104,6 @@ class _CustomDialogState extends State<CustomDialog> {
       double middleLeftPos = (screenWidth / 2) - (dialogWidth / 2);
       dialogPos = Offset(middleLeftPos, middleTopPos);
     }
-
-    if (old != null && dialogPos.dx != old) {
-      enableArrow = false;
-      Future.delayed(Duration(milliseconds: 300), () {
-        if (mounted) {
-          setState(() {
-            if (widget.targetWidgetContext != null) {
-              static = widget.static;
-              enableArrow = widget.enableArrow;
-            }
-          });
-        }
-      });
-    }
   }
 
   void getDialogHeight(Orientation orientation) {
@@ -139,6 +111,9 @@ class _CustomDialogState extends State<CustomDialog> {
         screenHeight * (orientation == Orientation.landscape ? 0.78 : 0.55);
     dialogHeight = widget.height ?? height;
     oriHeight = dialogHeight;
+
+    dialogSizeNotifier.value =
+        Size(dialogSizeNotifier.value.width, dialogHeight);
   }
 
   void getDialogWidth(Orientation orientation) {
@@ -149,15 +124,73 @@ class _CustomDialogState extends State<CustomDialog> {
     if (widget.width == null && dialogWidth < 350) {
       dialogWidth = 350;
     }
+
+    dialogSizeNotifier.value =
+        Size(dialogWidth, dialogSizeNotifier.value.height);
+  }
+
+  void updateRenderBox() {
+    if (widget.targetWidgetContext != null &&
+        (widget.targetWidgetContext!.mounted)) {
+      targetWidgetRBox =
+          widget.targetWidgetContext?.findRenderObject() as RenderBox?;
+
+      targetWidgetSize = targetWidgetRBox?.size;
+
+      targetWidgetPos = targetWidgetRBox?.localToGlobal(Offset.zero);
+    } else {
+      targetWidgetRBox = null;
+      targetWidgetSize = null;
+      targetWidgetPos = null;
+    }
+
+    targetWidgetPosNotifier.value = targetWidgetPos ?? Offset.zero;
   }
 
   @override
   void initState() {
     super.initState;
-
     oldOrientation = MediaQuery.of(widget.context).orientation;
     getDialogHeight(oldOrientation);
     getDialogWidth(oldOrientation);
+
+    updateRenderBox();
+    updateDialogPos(widget.context);
+
+    dialogSizeNotifier.addListener(() {
+      // updateDialogPos(context);
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   if (mounted) {
+      //     setState(() {});
+      //   }
+      // });
+    });
+
+    targetWidgetPosNotifier.addListener(() {
+      // updateDialogPos(context);
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   if (mounted) {
+      //     setState(() {});
+      //   }
+      // });
+    });
+
+    screenSizeNotifier.addListener(() {
+      updateDialogPos(context);
+    });
+
+    isKeyboardVisibleNotifier.addListener(() {
+      if (widget.pushDialogAboveWhenKeyboardShow &&
+          !isKeyboardVisibleNotifier.value) {
+        Future.delayed(Duration(milliseconds: 300), () {
+          if (mounted) {
+            setState(() {
+              enableArrow = widget.targetWidgetContext != null ? true : false;
+            });
+          }
+        });
+      }
+    });
   }
 
   @override
@@ -168,11 +201,9 @@ class _CustomDialogState extends State<CustomDialog> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
-    updateDialogPos();
   }
 
-  void calculatePos(AlignTargetWidget alignment) {
+  void calculatePos(AlignTargetWidget alignment, BuildContext context) {
     PositionCalculator calculator = PositionCalculator(
       dialogSize: Size(dialogWidth, dialogHeight),
       targetWidgetSize: targetWidgetSize!,
@@ -219,7 +250,7 @@ class _CustomDialogState extends State<CustomDialog> {
     dialogPos = calculator.preventOverflow(dialogPos);
   }
 
-  void calculateArrowPos(AlignTargetWidget alignment) {
+  void calculateArrowPos(AlignTargetWidget alignment, BuildContext context) {
     double screenPaddingTop =
         MediaQueryData.fromView(View.of(context)).padding.top;
     double leftPos = 0;
@@ -273,9 +304,9 @@ class _CustomDialogState extends State<CustomDialog> {
           double y = widget.adjustment.dy;
           double x = widget.adjustment.dx;
 
-          double newDialogTop = dialogPos.dy! + y;
-          double newDialogLeft = dialogPos.dx! + x;
-          double newArrowLeft = arrowPos.dx! + x;
+          double newDialogTop = dialogPos.dy + y;
+          double newDialogLeft = dialogPos.dx + x;
+          double newArrowLeft = arrowPos.dx + x;
 
           dialogPos = Offset(newDialogLeft, newDialogTop);
           arrowPos = Offset(newArrowLeft, arrowPos.dy);
@@ -290,9 +321,9 @@ class _CustomDialogState extends State<CustomDialog> {
           double y = widget.adjustment.dy;
           double x = widget.adjustment.dx;
 
-          double newDialogTop = dialogPos.dy! + y;
-          double newDilogLeft = dialogPos.dx! + x;
-          double newArrowTop = arrowPos.dy! + y;
+          double newDialogTop = dialogPos.dy + y;
+          double newDilogLeft = dialogPos.dx + x;
+          double newArrowTop = arrowPos.dy + y;
 
           dialogPos = Offset(newDilogLeft, newDialogTop);
           arrowPos = Offset(arrowPos.dx, newArrowTop);
@@ -302,12 +333,14 @@ class _CustomDialogState extends State<CustomDialog> {
     }
   }
 
-  late Orientation oldOrientation;
-
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
+    screenSizeNotifier.value = Size(screenWidth, screenHeight);
+
+    // print('-------');
+    // print('dialogPos: $dialogPos');
 
     return OrientationBuilder(builder: (context, orientation) {
       getDialogHeight(orientation);
@@ -318,6 +351,7 @@ class _CustomDialogState extends State<CustomDialog> {
       //   print('dialog left pos: $dialogPos.dx, dialog top pos: $dialogPos.dy');
 
       if (oldOrientation != orientation) {
+        updateDialogPos(context, forceCenter: true);
         // Future.delayed(Duration(milliseconds: 500), () {
         //   if (mounted) {
         //     setState(() {
@@ -336,13 +370,14 @@ class _CustomDialogState extends State<CustomDialog> {
               Consumer<ScreenHeight>(builder: (context, screenHeight, child) {
             bool isKeyboardVisible = screenHeight.isOpen;
             double paddingWhenKeyboardShow = screenHeight.keyboardHeight;
+            isKeyboardVisibleNotifier.value = isKeyboardVisible;
             return LayoutBuilder(builder: (context, constraints) {
               if (isKeyboardVisible) {
                 double screenHeight = constraints.maxHeight;
 
                 double newHeight = oriHeight -
                     (paddingWhenKeyboardShow -
-                        (screenHeight - (oriHeight + dialogPos.dy!)));
+                        (screenHeight - (oriHeight + dialogPos.dy)));
 
                 if (widget.pushDialogAboveWhenKeyboardShow) {
                   newHeight = oriHeight -
@@ -356,15 +391,8 @@ class _CustomDialogState extends State<CustomDialog> {
                   }
                 }
               } else {
-                if (widget.pushDialogAboveWhenKeyboardShow) {
-                  Future.delayed(Duration(milliseconds: 200), () {
-                    enableArrow =
-                        widget.targetWidgetContext != null ? true : false;
-                  });
-                }
                 dialogHeight = oriHeight;
               }
-
               return Stack(
                 alignment: Alignment.center,
                 children: [
@@ -376,7 +404,8 @@ class _CustomDialogState extends State<CustomDialog> {
                           },
                   ),
                   AnimatedPositioned(
-                    duration: Duration(milliseconds: 200),
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.fastEaseInToSlowEaseOut,
                     top: isKeyboardVisible &&
                             widget.pushDialogAboveWhenKeyboardShow
                         ? 10

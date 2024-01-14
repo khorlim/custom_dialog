@@ -16,7 +16,7 @@ class PositionCalculator {
     required this.arrowSize,
     this.distance = 0,
   });
-  Size get _tscreenSize => MediaQuery.of(context).size;
+  Size get _tscreenSize => MediaQueryData.fromView(View.of(context)).size;
   double get _paddingTop =>
       MediaQueryData.fromView(View.of(context)).padding.top;
   double get _paddingBottom =>
