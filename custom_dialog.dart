@@ -53,10 +53,6 @@ class CustomDialog extends StatefulWidget {
     this.static = true,
   }) {
     safeAreaTopHeight = MediaQueryData.fromView(ui.window).padding.top;
-
-    RenderBox? renderBox =
-        targetWidgetContext?.findRenderObject() as RenderBox?;
-    targetWidgetPos = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
   }
 
   late final double safeAreaTopHeight;
