@@ -85,6 +85,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     deviceType = getDeviceType(context);
 
     Widget modalBottomSheet = SafeArea(
+      bottom: false,
       child: CustomModalBottomSheet(
         enableDrag: false,
         route: this,
