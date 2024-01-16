@@ -11,6 +11,7 @@ class CustomDialog extends StatefulWidget {
   final BuildContext context;
   final double? height;
   final double? width;
+
   final Widget? appBar;
   final Widget child;
   final BuildContext? targetWidgetContext;
@@ -105,7 +106,11 @@ class _CustomDialogState extends State<CustomDialog> {
   void getDialogHeight(Orientation orientation) {
     double height =
         screenHeight * (orientation == Orientation.landscape ? 0.78 : 0.55);
+
+    // double manualRatioHeight = screenHeight * (widget.heightRatio ?? 1);
+
     dialogHeight = widget.height ?? height;
+
     oriHeight = dialogHeight;
 
     dialogSizeNotifier.value =
@@ -115,6 +120,9 @@ class _CustomDialogState extends State<CustomDialog> {
   void getDialogWidth(Orientation orientation) {
     double width =
         screenWidth * (orientation == Orientation.landscape ? 0.35 : 0.47);
+
+    //  double manualRatioWidth = screenWidth * (widget.widthRatio ?? 1);
+
     dialogWidth = widget.width ?? width;
 
     if (widget.width == null && dialogWidth < 350) {

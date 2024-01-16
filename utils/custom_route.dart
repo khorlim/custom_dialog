@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tunaipro/share_code/custom_dialog/custom_dialog.dart';
 import 'package:tunaipro/share_code/custom_dialog/utils/custom_modal_bottom_sheet.dart';
 import 'package:tunaipro/share_code/function/dialog_manager.dart';
@@ -8,9 +9,12 @@ import 'package:tunaipro/share_code/responsive/device_type.dart';
 class CustomPageRoute<T> extends PopupRoute<T> {
   final WidgetBuilder builder;
   final DialogType dialogType;
-  final double? width;
 
+  final double? width;
   final double? height;
+
+  final double? heightRatio;
+  final double? widthRatio;
 
   final AlignTargetWidget? alignTargetWidget;
 
@@ -59,6 +63,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.pushDialogAboveWhenKeyboardShow,
     this.followArrow,
     this.distanceBetweenTargetWidget,
+    this.heightRatio,
+    this.widthRatio,
   });
 
   @override
@@ -99,8 +105,10 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       ),
     );
 
-    double centerDialogHeight = MediaQuery.of(context).size.height * 0.8;
-    double centerDialogWidth = MediaQuery.of(context).size.width * 0.8;
+    double manaulDialogHeight =
+        MediaQuery.of(context).size.height * (heightRatio ?? 0.8);
+    double manualDialogWidth =
+        MediaQuery.of(context).size.width * (widthRatio ?? 0.8);
 
     BuildContext? targetCtxt;
     if (targetWidgetContext != null && targetWidgetContext!.mounted) {
@@ -109,8 +117,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
     Widget dialog = CustomDialog(
       context: context,
-      height: height ?? (isCenterDialog ? centerDialogHeight : null),
-      width: width ?? (isCenterDialog ? centerDialogWidth : null),
+      height: height ?? (isCenterDialog ? manaulDialogHeight : null),
+      width: width ?? (isCenterDialog ? manualDialogWidth : null),
       alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
       enableArrow: enableArrow ?? true,
       targetWidgetContext: targetCtxt,
