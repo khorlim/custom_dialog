@@ -5,6 +5,7 @@ import 'package:tunaipro/share_code/custom_dialog/custom_dialog.dart';
 import 'package:tunaipro/share_code/custom_dialog/utils/custom_modal_bottom_sheet.dart';
 import 'package:tunaipro/share_code/function/dialog_manager.dart';
 import 'package:tunaipro/share_code/responsive/device_type.dart';
+import 'package:tunaipro/theme/app_style.dart';
 
 class CustomPageRoute<T> extends PopupRoute<T> {
   final WidgetBuilder builder;
@@ -68,7 +69,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   });
 
   @override
-  Color get barrierColor => Colors.black.withOpacity(0.2);
+  Color get barrierColor => black.withOpacity(0.2);
 
   @override
   String get barrierLabel => 'CustomPageRoute';
