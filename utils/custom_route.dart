@@ -118,8 +118,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
     Widget dialog = CustomDialog(
       context: context,
-      height: height ?? (isCenterDialog ? manaulDialogHeight : null),
-      width: width ?? (isCenterDialog ? manualDialogWidth : null),
+      height: height ?? (heightRatio != null ? manaulDialogHeight : null),
+      width: width ?? (widthRatio != null ? manualDialogWidth : null),
       alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
       enableArrow: enableArrow ?? true,
       targetWidgetContext: targetCtxt,
