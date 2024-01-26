@@ -16,6 +16,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
   final double? heightRatio;
   final double? widthRatio;
+  final double? heightRatioInPortrait;
+  final double? widthRatioInPortrait;
 
   final AlignTargetWidget? alignTargetWidget;
 
@@ -69,6 +71,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.heightRatio,
     this.widthRatio,
     this.keepDialogOnMobile = false,
+    this.heightRatioInPortrait,
+    this.widthRatioInPortrait,
   });
 
   @override
@@ -81,7 +85,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   bool get maintainState => true;
 
   bool get isCenterDialog =>
-      dialogType == DialogType.center || dialogType == DialogType.adaptiveCenter;
+      dialogType == DialogType.center ||
+      dialogType == DialogType.adaptiveCenter;
 
   late DeviceType deviceType;
 
@@ -89,8 +94,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   Duration get transitionDuration => Duration(milliseconds: 300);
 
   @override
-  Widget buildPage(
-      BuildContext context, Animation<double> animation, Animation<double> secondaryAnimation) {
+  Widget buildPage(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation) {
     deviceType = getDeviceType(context);
 
     Widget modalBottomSheet = SafeArea(
@@ -108,29 +113,43 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       ),
     );
 
-    double manaulDialogHeight = MediaQuery.of(context).size.height * (heightRatio ?? 0.8);
-    double manualDialogWidth = MediaQuery.of(context).size.width * (widthRatio ?? 0.8);
+    double screenHeight = MediaQuery.of(context).size.height;
+    double screenWidth = MediaQuery.of(context).size.width;
+
+    double manaulDialogHeight = screenHeight * (heightRatio ?? 0.8);
+    double manualDialogWidth = screenWidth * (widthRatio ?? 0.8);
 
     BuildContext? targetCtxt;
     if (targetWidgetContext != null && targetWidgetContext!.mounted) {
       targetCtxt = targetWidgetContext;
     }
 
-    Widget dialog = CustomDialog(
-      context: context,
-      height: height ?? ((heightRatio != null || isCenterDialog) ? manaulDialogHeight : null),
-      width: width ?? ((widthRatio != null || isCenterDialog) ? manualDialogWidth : null),
-      alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
-      enableArrow: enableArrow ?? true,
-      targetWidgetContext: targetCtxt,
-      onTapOutside: onTapOutside,
-      adjustment: adjustment ?? Offset.zero,
-      showOverFlowArrow: showOverFlowArrow ?? true,
-      overflowLeft: overflowLeft ?? 0,
-      followArrow: followArrow ?? false,
-      pushDialogAboveWhenKeyboardShow: pushDialogAboveWhenKeyboardShow ?? false,
-      child: builder(context),
-    );
+    Widget dialog = OrientationBuilder(builder: (context, orientation) {
+      if (orientation == Orientation.portrait) {
+        manaulDialogHeight = screenHeight * (heightRatioInPortrait ?? 0.5);
+        manualDialogWidth = screenWidth * (widthRatioInPortrait ?? 0.8);
+      }
+      return CustomDialog(
+        context: context,
+        height: height ??
+            ((heightRatio != null || isCenterDialog)
+                ? manaulDialogHeight
+                : null),
+        width: width ??
+            ((widthRatio != null || isCenterDialog) ? manualDialogWidth : null),
+        alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
+        enableArrow: enableArrow ?? true,
+        targetWidgetContext: targetCtxt,
+        onTapOutside: onTapOutside,
+        adjustment: adjustment ?? Offset.zero,
+        showOverFlowArrow: showOverFlowArrow ?? true,
+        overflowLeft: overflowLeft ?? 0,
+        followArrow: followArrow ?? false,
+        pushDialogAboveWhenKeyboardShow:
+            pushDialogAboveWhenKeyboardShow ?? false,
+        child: builder(context),
+      );
+    });
 
     if (deviceType == DeviceType.mobile && keepDialogOnMobile == false) {
       return modalBottomSheet;
@@ -143,7 +162,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
     deviceType = getDeviceType(context);
-    if ((deviceType == DeviceType.mobile && keepDialogOnMobile == false) || isCenterDialog) {
+    if ((deviceType == DeviceType.mobile && keepDialogOnMobile == false) ||
+        isCenterDialog) {
       const begin = Offset(0.0, 1.0);
       const end = Offset.zero;
       const curve = Curves.easeInOut;
@@ -175,7 +195,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   }
 
   final Animatable<double> _dialogScaleTween =
-      Tween<double>(begin: 1.3, end: 1.0).chain(CurveTween(curve: Curves.linearToEaseOut));
+      Tween<double>(begin: 1.3, end: 1.0)
+          .chain(CurveTween(curve: Curves.linearToEaseOut));
 
   @override
   bool get barrierDismissible => false;
