@@ -48,6 +48,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   final double? distanceBetweenTargetWidget;
 
   final bool keepDialogOnMobile;
+  final ValueNotifier<bool>? dismissible;
 
   CustomPageRoute({
     required this.builder,
@@ -73,6 +74,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.keepDialogOnMobile = false,
     this.heightRatioInPortrait,
     this.widthRatioInPortrait,
+    this.dismissible,
   });
 
   @override
@@ -140,7 +142,13 @@ class CustomPageRoute<T> extends PopupRoute<T> {
         alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
         enableArrow: enableArrow ?? true,
         targetWidgetContext: targetCtxt,
-        onTapOutside: onTapOutside,
+        onTapOutside: onTapOutside ??
+            () {
+              if (dismissible == null || dismissible?.value == true) {
+                Navigator.pop(context);
+                return;
+              }
+            },
         adjustment: adjustment ?? Offset.zero,
         showOverFlowArrow: showOverFlowArrow ?? true,
         overflowLeft: overflowLeft ?? 0,
