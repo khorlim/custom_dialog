@@ -192,6 +192,9 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       var fadeTween = Tween<double>(begin: 0.3, end: 1.0)
           .chain(CurveTween(curve: Curves.linearToEaseOut));
 
+      var closingSizeTween = Tween<double>(begin: 0.0, end: 1)
+          .chain(CurveTween(curve: Curves.easeOutBack));
+
       RenderBox? renderBox =
           targetWidgetContext?.findRenderObject() as RenderBox?;
       Size size = renderBox?.size ?? Size.zero;
@@ -203,6 +206,14 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
       double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
       double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
+
+      if (animation.status == AnimationStatus.reverse) {
+        return ScaleTransition(
+          alignment: Alignment(fractionHorizontal, fractionVertical),
+          scale: animation.drive(closingSizeTween),
+          child: child,
+        );
+      }
 
       return FadeTransition(
         opacity: animation.drive(fadeTween),

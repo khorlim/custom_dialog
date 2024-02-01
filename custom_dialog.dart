@@ -415,36 +415,39 @@ class _CustomDialogState extends State<CustomDialog> {
                         ? 10
                         : dialogPos.dy,
                     left: dialogPos.dx,
-                    child: Material(
-                      clipBehavior: Clip.antiAlias,
-                      elevation: 5,
-                      shadowColor: Colors.grey.withOpacity(0.3),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 0),
+                    child: Container(
+                      decoration: BoxDecoration(boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.15),
+                          spreadRadius: 20,
+                          blurRadius: 30,
+                          offset: Offset(0, 0),
+                        ),
+                      ]),
+                      child: Material(
                         clipBehavior: Clip.antiAlias,
-                        padding: EdgeInsets.zero,
-                        decoration: BoxDecoration(
+                        elevation: 0.0,
+                        shadowColor: Colors.grey.withOpacity(0.3),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: AnimatedContainer(
+                          duration: Duration(milliseconds: 0),
+                          clipBehavior: Clip.antiAlias,
+                          padding: EdgeInsets.zero,
+                          decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
                                 bottomLeft: Radius.circular(10),
                                 bottomRight: Radius.circular(10)),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.1),
-                                spreadRadius: 2,
-                                blurRadius: 10,
-                                offset: Offset(0, -2),
-                              ),
-                            ]),
-                        height: dialogHeight,
-                        width: dialogWidth,
-                        child: Column(
-                          children: [
-                            widget.appBar ?? Container(),
-                            Expanded(child: widget.child),
-                          ],
+                          ),
+                          height: dialogHeight,
+                          width: dialogWidth,
+                          child: Column(
+                            children: [
+                              widget.appBar ?? Container(),
+                              Expanded(child: widget.child),
+                            ],
+                          ),
                         ),
                       ),
                     ),
