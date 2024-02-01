@@ -137,6 +137,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       }
       return CustomDialog(
         context: context,
+        distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
         height: height ??
             ((heightRatio != null || isCenterDialog)
                 ? manaulDialogHeight
