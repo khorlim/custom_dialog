@@ -49,6 +49,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
   final bool keepDialogOnMobile;
   final ValueNotifier<bool>? dismissible;
+  final Color? backgroundColor;
+  final bool isPopupMenu;
 
   CustomPageRoute({
     required this.builder,
@@ -75,10 +77,12 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.heightRatioInPortrait,
     this.widthRatioInPortrait,
     this.dismissible,
+    this.backgroundColor,
+    this.isPopupMenu = false,
   });
 
   @override
-  Color get barrierColor => black.withOpacity(0.2);
+  Color get barrierColor => backgroundColor ?? black.withOpacity(0.2);
 
   @override
   String get barrierLabel => 'CustomPageRoute';
@@ -181,6 +185,32 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       var offsetAnimation = animation.drive(tween);
 
       return SlideTransition(position: offsetAnimation, child: child);
+    } else if (isPopupMenu) {
+      var sizeTween = Tween<double>(begin: 0.0, end: 1.0)
+          .chain(CurveTween(curve: Curves.linearToEaseOut));
+      var fadeTween = Tween<double>(begin: 0.3, end: 1.0)
+          .chain(CurveTween(curve: Curves.linearToEaseOut));
+
+      RenderBox? renderBox =
+          targetWidgetContext?.findRenderObject() as RenderBox?;
+      Size size = renderBox?.size ?? Size.zero;
+      Offset targetPosition =
+          renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
+      Offset centerPos = Offset(targetPosition.dx + (size.width / 2),
+          targetPosition.dy + (size.height / 2));
+      Size screenSize = MediaQuery.of(context).size;
+
+      double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
+      double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
+
+      return FadeTransition(
+        opacity: animation.drive(fadeTween),
+        child: ScaleTransition(
+          alignment: Alignment(fractionHorizontal, fractionVertical),
+          scale: animation.drive(sizeTween),
+          child: child,
+        ),
+      );
     } else {
       final CurvedAnimation fadeAnimation = CurvedAnimation(
         parent: animation,
