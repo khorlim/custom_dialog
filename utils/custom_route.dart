@@ -96,6 +96,12 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
   late DeviceType deviceType;
 
+  bool get useSlideTransition =>
+      (deviceType == DeviceType.mobile ||
+          dialogType == DialogType.adaptiveCenter) &&
+      keepDialogOnMobile == false &&
+      dialogType != DialogType.position;
+
   bool get showModalBottom =>
       deviceType == DeviceType.mobile &&
       keepDialogOnMobile == false &&
@@ -180,7 +186,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
     deviceType = getDeviceType(context);
-    if (showModalBottom) {
+    if (useSlideTransition) {
       const begin = Offset(0.0, 1.0);
       const end = Offset.zero;
       const curve = Curves.easeInOut;
