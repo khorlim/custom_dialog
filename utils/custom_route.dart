@@ -96,6 +96,11 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
   late DeviceType deviceType;
 
+  bool get showModalBottom =>
+      deviceType == DeviceType.mobile &&
+      keepDialogOnMobile == false &&
+      dialogType != DialogType.position;
+
   @override
   Duration get transitionDuration => Duration(milliseconds: 300);
 
@@ -164,7 +169,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       );
     });
 
-    if (deviceType == DeviceType.mobile && keepDialogOnMobile == false) {
+    if (showModalBottom) {
       return modalBottomSheet;
     } else {
       return dialog;
@@ -175,8 +180,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
     deviceType = getDeviceType(context);
-    if ((deviceType == DeviceType.mobile && keepDialogOnMobile == false) ||
-        isCenterDialog) {
+    if (showModalBottom) {
       const begin = Offset(0.0, 1.0);
       const end = Offset.zero;
       const curve = Curves.easeInOut;
