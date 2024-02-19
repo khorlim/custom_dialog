@@ -82,6 +82,9 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   });
 
   @override
+  Duration get transitionDuration => Duration(milliseconds: 200);
+
+  @override
   Color get barrierColor => backgroundColor ?? black.withOpacity(0.2);
 
   @override
@@ -106,9 +109,6 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       deviceType == DeviceType.mobile &&
       keepDialogOnMobile == false &&
       dialogType != DialogType.position;
-
-  @override
-  Duration get transitionDuration => Duration(milliseconds: 300);
 
   @override
   Widget buildPage(BuildContext context, Animation<double> animation,
@@ -189,7 +189,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     if (useSlideTransition) {
       const begin = Offset(0.0, 1.0);
       const end = Offset.zero;
-      const curve = Curves.easeInOut;
+      const curve = Curves.linearToEaseOut;
 
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
