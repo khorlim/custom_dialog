@@ -52,6 +52,9 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   final Color? backgroundColor;
   final bool isPopupMenu;
 
+  final double? maxHeight;
+  final double? maxWidth;
+
   CustomPageRoute({
     required this.builder,
     this.dialogType = DialogType.adaptivePosition,
@@ -79,6 +82,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.dismissible,
     this.backgroundColor,
     this.isPopupMenu = false,
+    this.maxHeight,
+    this.maxWidth,
   });
 
   @override
@@ -146,6 +151,16 @@ class CustomPageRoute<T> extends PopupRoute<T> {
         manaulDialogHeight = screenHeight * (heightRatioInPortrait ?? 0.5);
         manualDialogWidth = screenWidth * (widthRatioInPortrait ?? 0.8);
       }
+
+      if (maxHeight != null && manaulDialogHeight > maxHeight!) {
+        //  debugPrint('using max height : $maxHeight');
+        manaulDialogHeight = maxHeight!;
+      }
+      if (maxWidth != null && manualDialogWidth > maxWidth!) {
+        // debugPrint('using max width : $maxWidth');
+        manualDialogWidth = maxWidth!;
+      }
+
       return CustomDialog(
         context: context,
         distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,

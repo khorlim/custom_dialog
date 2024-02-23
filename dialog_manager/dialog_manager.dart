@@ -48,8 +48,7 @@ enum DialogShape {
   fatRectangle,
   expandedRectangle;
 
-  Size getLandscapeRatioSize(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
+  Size getLandscapeRatioSize() {
     switch (this) {
       case DialogShape.slimRectangle:
         return Size(0.36, 0.82);
@@ -62,8 +61,7 @@ enum DialogShape {
     }
   }
 
-  Size getPortraitRatioSize(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
+  Size getPortraitRatioSize() {
     switch (this) {
       case DialogShape.slimRectangle:
         return Size(0.55, 0.6);
@@ -73,6 +71,19 @@ enum DialogShape {
         return Size(0.7, 0.6);
       case DialogShape.expandedRectangle:
         return Size(0.9, 0.7);
+    }
+  }
+
+  Size getMaxSize() {
+    switch (this) {
+      case DialogShape.slimRectangle:
+        return Size(430, 650);
+      case DialogShape.regularRectangle:
+        return Size(520, 650);
+      case DialogShape.fatRectangle:
+        return Size(600, 650);
+      case DialogShape.expandedRectangle:
+        return Size(1500, 800);
     }
   }
 }
@@ -179,8 +190,9 @@ class DialogManager {
 
   // Function to show the dialog based on the device type
   Future<T?> show<T>() async {
-    Size landscapeRatioSize = dialogShape.getLandscapeRatioSize(context);
-    Size portraitRatioSize = dialogShape.getPortraitRatioSize(context);
+    Size landscapeRatioSize = dialogShape.getLandscapeRatioSize();
+    Size portraitRatioSize = dialogShape.getPortraitRatioSize();
+    Size maxSize = dialogShape.getMaxSize();
     return Navigator.push(
         context,
         CustomPageRoute(
@@ -207,6 +219,8 @@ class DialogManager {
           widthRatio: landscapeRatioSize.width,
           heightRatioInPortrait: portraitRatioSize.height,
           widthRatioInPortrait: portraitRatioSize.width,
+          maxHeight: maxSize.height,
+          maxWidth: maxSize.width,
         ));
 
     // if (dialogType == DialogType.modalBottomSheet) {
