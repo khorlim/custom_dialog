@@ -52,7 +52,7 @@ enum DialogShape {
     final Size screenSize = MediaQuery.of(context).size;
     switch (this) {
       case DialogShape.slimRectangle:
-        return Size(0.38, 0.82);
+        return Size(0.36, 0.82);
       case DialogShape.regularRectangle:
         return Size(0.43, 0.82);
       case DialogShape.fatRectangle:
@@ -66,13 +66,13 @@ enum DialogShape {
     final Size screenSize = MediaQuery.of(context).size;
     switch (this) {
       case DialogShape.slimRectangle:
-        return Size(0.8, 0.5);
+        return Size(0.55, 0.6);
       case DialogShape.regularRectangle:
-        return Size(0.9, 0.6);
+        return Size(0.65, 0.6);
       case DialogShape.fatRectangle:
-        return Size(0.9, 0.7);
+        return Size(0.7, 0.6);
       case DialogShape.expandedRectangle:
-        return Size(0.9, 0.8);
+        return Size(0.9, 0.7);
     }
   }
 }
