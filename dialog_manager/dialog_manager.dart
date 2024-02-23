@@ -42,16 +42,53 @@ enum DialogType {
   adaptiveCenter
 }
 
+enum DialogShape {
+  slimRectangle,
+  regularRectangle,
+  fatRectangle,
+  expandedRectangle;
+
+  Size getLandscapeRatioSize(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    switch (this) {
+      case DialogShape.slimRectangle:
+        return Size(0.38, 0.82);
+      case DialogShape.regularRectangle:
+        return Size(0.43, 0.82);
+      case DialogShape.fatRectangle:
+        return Size(0.5, 0.82);
+      case DialogShape.expandedRectangle:
+        return Size(0.8, 0.82);
+    }
+  }
+
+  Size getPortraitRatioSize(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    switch (this) {
+      case DialogShape.slimRectangle:
+        return Size(0.8, 0.5);
+      case DialogShape.regularRectangle:
+        return Size(0.9, 0.6);
+      case DialogShape.fatRectangle:
+        return Size(0.9, 0.7);
+      case DialogShape.expandedRectangle:
+        return Size(0.9, 0.8);
+    }
+  }
+}
+
 class DialogManager {
   // Context in which the dialog is displayed
   final BuildContext context;
 
   final DialogType dialogType;
 
-  final double? heightRatio;
-  final double? widthRatio;
-  final double? heightRatioInPortrait;
-  final double? widthRatioInPortrait;
+  final DialogShape dialogShape;
+
+  // final double? heightRatio;
+  // final double? widthRatio;
+  // final double? heightRatioInPortrait;
+  // final double? widthRatioInPortrait;
 
   // Widget to be displayed inside the dialog
   final Widget child;
@@ -133,11 +170,8 @@ class DialogManager {
     this.distanceBetweenTargetWidget,
     this.bottomSheetHeight,
     this.dialogType = DialogType.adaptivePosition,
-    this.heightRatio,
-    this.widthRatio,
     this.keepDialogOnMobile = false,
-    this.heightRatioInPortrait,
-    this.widthRatioInPortrait,
+    this.dialogShape = DialogShape.slimRectangle,
     this.dismissible,
   }) : deviceType = getDeviceType(context);
 
@@ -145,6 +179,8 @@ class DialogManager {
 
   // Function to show the dialog based on the device type
   Future<T?> show<T>() async {
+    Size landscapeRatioSize = dialogShape.getLandscapeRatioSize(context);
+    Size portraitRatioSize = dialogShape.getPortraitRatioSize(context);
     return Navigator.push(
         context,
         CustomPageRoute(
@@ -152,8 +188,6 @@ class DialogManager {
           dialogType: dialogType,
           width: width,
           height: height,
-          heightRatio: heightRatio,
-          widthRatio: widthRatio,
           alignTargetWidget: alignTargetWidget,
           enableArrow: enableArrow,
           arrowWidth: arrowWidth,
@@ -168,9 +202,11 @@ class DialogManager {
           followArrow: followArrow,
           distanceBetweenTargetWidget: distanceBetweenTargetWidget,
           keepDialogOnMobile: keepDialogOnMobile,
-          heightRatioInPortrait: heightRatioInPortrait,
-          widthRatioInPortrait: widthRatioInPortrait,
           dismissible: dismissible,
+          heightRatio: landscapeRatioSize.height,
+          widthRatio: landscapeRatioSize.width,
+          heightRatioInPortrait: portraitRatioSize.height,
+          widthRatioInPortrait: portraitRatioSize.width,
         ));
 
     // if (dialogType == DialogType.modalBottomSheet) {
