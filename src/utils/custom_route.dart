@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:tunaipro/share_code/custom_dialog/custom_dialog.dart';
-import 'package:tunaipro/share_code/custom_dialog/utils/custom_modal_bottom_sheet.dart';
-import 'package:tunaipro/share_code/function/dialog_manager.dart';
-import 'package:tunaipro/share_code/responsive/device_type.dart';
+import 'package:tunaipro/share_code/custom_dialog/src/custom_dialog.dart';
+import 'package:tunaipro/share_code/custom_dialog/src/utils/custom_modal_bottom_sheet.dart';
+import 'package:tunaipro/share_code/custom_dialog/dialog_manager/dialog_manager.dart';
+import 'package:tunaipro/theme/responsive/device_type.dart';
 import 'package:tunaipro/theme/app_style.dart';
 
 class CustomPageRoute<T> extends PopupRoute<T> {
