@@ -46,6 +46,7 @@ enum DialogShape {
   slimRectangle,
   regularRectangle,
   fatRectangle,
+  obesityRectangle,
   expandedRectangle;
 
   Size getLandscapeRatioSize() {
@@ -56,6 +57,8 @@ enum DialogShape {
         return Size(0.43, 0.82);
       case DialogShape.fatRectangle:
         return Size(0.5, 0.82);
+      case DialogShape.obesityRectangle:
+        return Size(0.63, 0.82);
       case DialogShape.expandedRectangle:
         return Size(0.8, 0.82);
     }
@@ -69,6 +72,8 @@ enum DialogShape {
         return Size(0.65, 0.6);
       case DialogShape.fatRectangle:
         return Size(0.7, 0.6);
+      case DialogShape.obesityRectangle:
+        return Size(0.75, 0.6);
       case DialogShape.expandedRectangle:
         return Size(0.9, 0.7);
     }
@@ -82,6 +87,8 @@ enum DialogShape {
         return Size(520, 650);
       case DialogShape.fatRectangle:
         return Size(600, 650);
+      case DialogShape.obesityRectangle:
+        return Size(800, 650);
       case DialogShape.expandedRectangle:
         return Size(1500, 800);
     }
