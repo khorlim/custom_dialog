@@ -53,7 +53,7 @@ class CustomDialog extends StatefulWidget {
     this.adjustSizeWhenKeyboardShow = true,
     this.static = true,
   }) {
-    safeAreaTopHeight = MediaQueryData.fromView(ui.window).padding.top;
+    safeAreaTopHeight = MediaQueryData.fromView(View.of(context)).padding.top;
   }
 
   late final double safeAreaTopHeight;
@@ -71,9 +71,6 @@ class _CustomDialogState extends State<CustomDialog> {
   late double dialogWidth;
   late double oriHeight;
 
-  ValueNotifier<Size> dialogSizeNotifier = ValueNotifier<Size>(Size.zero);
-  ValueNotifier<Size> screenSizeNotifier = ValueNotifier<Size>(Size.zero);
-
   late double screenHeight = MediaQuery.of(widget.context).size.height;
   late double screenWidth = MediaQuery.of(widget.context).size.width;
 
@@ -81,7 +78,6 @@ class _CustomDialogState extends State<CustomDialog> {
   Offset? targetWidgetPos;
   Size? targetWidgetSize;
 
-  ValueNotifier<Offset?> targetWidgetPosNotifier = ValueNotifier<Offset?>(null);
   ValueNotifier<bool> isKeyboardVisibleNotifier = ValueNotifier<bool>(false);
 
   Offset dialogPos = Offset.zero;
@@ -112,9 +108,6 @@ class _CustomDialogState extends State<CustomDialog> {
     dialogHeight = widget.height ?? height;
 
     oriHeight = dialogHeight;
-
-    dialogSizeNotifier.value =
-        Size(dialogSizeNotifier.value.width, dialogHeight);
   }
 
   void getDialogWidth(Orientation orientation) {
@@ -128,9 +121,6 @@ class _CustomDialogState extends State<CustomDialog> {
     if (widget.width == null && dialogWidth < 350) {
       dialogWidth = 350;
     }
-
-    dialogSizeNotifier.value =
-        Size(dialogWidth, dialogSizeNotifier.value.height);
   }
 
   void updateRenderBox() {
@@ -147,41 +137,17 @@ class _CustomDialogState extends State<CustomDialog> {
       targetWidgetSize = null;
       targetWidgetPos = null;
     }
-
-    targetWidgetPosNotifier.value = targetWidgetPos ?? Offset.zero;
   }
 
   @override
   void initState() {
-    super.initState;
+    super.initState();
     oldOrientation = MediaQuery.of(widget.context).orientation;
     getDialogHeight(oldOrientation);
     getDialogWidth(oldOrientation);
 
     updateRenderBox();
     updateDialogPos(widget.context);
-
-    dialogSizeNotifier.addListener(() {
-      // updateDialogPos(context);
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   if (mounted) {
-      //     setState(() {});
-      //   }
-      // });
-    });
-
-    targetWidgetPosNotifier.addListener(() {
-      // updateDialogPos(context);
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   if (mounted) {
-      //     setState(() {});
-      //   }
-      // });
-    });
-
-    screenSizeNotifier.addListener(() {
-      updateDialogPos(context);
-    });
 
     isKeyboardVisibleNotifier.addListener(() {
       if (widget.pushDialogAboveWhenKeyboardShow &&
@@ -341,7 +307,6 @@ class _CustomDialogState extends State<CustomDialog> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
-    screenSizeNotifier.value = Size(screenWidth, screenHeight);
 
     // print('-------');
     // print('dialogPos: $dialogPos');
@@ -495,6 +460,12 @@ class _CustomDialogState extends State<CustomDialog> {
         ),
       );
     });
+  }
+
+  @override
+  void dispose() {
+    isKeyboardVisibleNotifier.dispose();
+    super.dispose();
   }
 
   ArrowPointing getArrowPointing() {

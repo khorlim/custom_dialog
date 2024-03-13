@@ -190,11 +190,9 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       );
     });
 
-    if (showModalBottom) {
-      return modalBottomSheet;
-    } else {
-      return dialog;
-    }
+    return DisplayFeatureSubScreen(
+      child: showModalBottom ? modalBottomSheet : dialog,
+    );
   }
 
   @override
@@ -202,77 +200,98 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       Animation<double> secondaryAnimation, Widget child) {
     deviceType = getDeviceType(context);
     if (useSlideTransition) {
-      const begin = Offset(0.0, 1.0);
-      const end = Offset.zero;
-      const curve = Curves.linearToEaseOut;
-
-      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-      var offsetAnimation = animation.drive(tween);
-
-      return SlideTransition(position: offsetAnimation, child: child);
+      return buildSlideTransition(
+          context, animation, secondaryAnimation, child);
     } else if (isPopupMenu) {
-      var sizeTween = Tween<double>(begin: 0.0, end: 1.0)
-          .chain(CurveTween(curve: Curves.linearToEaseOut));
-      var fadeTween = Tween<double>(begin: 0.3, end: 1.0)
-          .chain(CurveTween(curve: Curves.linearToEaseOut));
-
-      var closingSizeTween = Tween<double>(begin: 0.0, end: 1)
-          .chain(CurveTween(curve: Curves.easeOutBack));
-
-      RenderBox? renderBox =
-          targetWidgetContext?.findRenderObject() as RenderBox?;
-      Size size = renderBox?.size ?? Size.zero;
-      Offset targetPosition =
-          renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
-      Offset centerPos = Offset(targetPosition.dx + (size.width / 2),
-          targetPosition.dy + (size.height / 2));
-      Size screenSize = MediaQuery.of(context).size;
-
-      double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
-      double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
-
-      if (animation.status == AnimationStatus.reverse) {
-        return ScaleTransition(
-          alignment: Alignment(fractionHorizontal, fractionVertical),
-          scale: animation.drive(closingSizeTween),
-          child: child,
-        );
-      }
-
-      return FadeTransition(
-        opacity: animation.drive(fadeTween),
-        child: ScaleTransition(
-          alignment: Alignment(fractionHorizontal, fractionVertical),
-          scale: animation.drive(sizeTween),
-          child: child,
-        ),
-      );
+      return buildPopupTransition(
+          context, animation, secondaryAnimation, child);
     } else {
-      final CurvedAnimation fadeAnimation = CurvedAnimation(
-        parent: animation,
-        curve: Curves.easeInOut,
-      );
-      if (animation.status == AnimationStatus.reverse) {
-        return FadeTransition(
-          opacity: fadeAnimation,
-          child: child,
-        );
-      }
-      return FadeTransition(
-        opacity: fadeAnimation,
-        child: ScaleTransition(
-          scale: animation.drive(_dialogScaleTween),
-          child: child,
-        ),
+      return buildDialogTransition(
+          context, animation, secondaryAnimation, child);
+    }
+  }
+
+  Widget buildSlideTransition(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
+    const begin = Offset(0.0, 1.0);
+    const end = Offset.zero;
+    const curve = Curves.linearToEaseOut;
+
+    var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+    var offsetAnimation = animation.drive(tween);
+
+    return SlideTransition(position: offsetAnimation, child: child);
+  }
+
+  Widget buildPopupTransition(BuildContext context, Animation<double> animation,
+      Animation<double> secondaryAnimation, Widget child) {
+    var sizeTween = Tween<double>(begin: 0.0, end: 1.0)
+        .chain(CurveTween(curve: Curves.linearToEaseOut));
+    var fadeTween = Tween<double>(begin: 0.3, end: 1.0)
+        .chain(CurveTween(curve: Curves.linearToEaseOut));
+
+    var closingSizeTween = Tween<double>(begin: 0.0, end: 1)
+        .chain(CurveTween(curve: Curves.easeOutBack));
+
+    RenderBox? renderBox =
+        targetWidgetContext?.findRenderObject() as RenderBox?;
+    Size size = renderBox?.size ?? Size.zero;
+    Offset targetPosition =
+        renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
+    Offset centerPos = Offset(targetPosition.dx + (size.width / 2),
+        targetPosition.dy + (size.height / 2));
+    Size screenSize = MediaQuery.of(context).size;
+
+    double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
+    double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
+
+    if (animation.status == AnimationStatus.reverse) {
+      return ScaleTransition(
+        alignment: Alignment(fractionHorizontal, fractionVertical),
+        scale: animation.drive(closingSizeTween),
+        child: child,
       );
     }
+
+    return FadeTransition(
+      opacity: animation.drive(fadeTween),
+      child: ScaleTransition(
+        alignment: Alignment(fractionHorizontal, fractionVertical),
+        scale: animation.drive(sizeTween),
+        child: child,
+      ),
+    );
+  }
+
+  Widget buildDialogTransition(
+      BuildContext context,
+      Animation<double> animation,
+      Animation<double> secondaryAnimation,
+      Widget child) {
+    final CurvedAnimation fadeAnimation = CurvedAnimation(
+      parent: animation,
+      curve: Curves.fastLinearToSlowEaseIn,
+    );
+    if (animation.status == AnimationStatus.reverse) {
+      return FadeTransition(
+        opacity: fadeAnimation,
+        child: child,
+      );
+    }
+
+    return FadeTransition(
+      opacity: fadeAnimation,
+      child: ScaleTransition(
+        scale: animation.drive(_dialogScaleTween),
+        child: child,
+      ),
+    );
   }
 
   final Animatable<double> _dialogScaleTween =
       Tween<double>(begin: 1.3, end: 1.0)
           .chain(CurveTween(curve: Curves.linearToEaseOut));
-
   @override
   bool get barrierDismissible => false;
 }
