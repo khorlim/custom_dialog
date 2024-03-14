@@ -28,7 +28,7 @@ class CustomDialog extends StatefulWidget {
   final double distanceBetweenTargetWidget;
   final bool adjustSizeWhenKeyboardShow;
   final bool static;
-
+  final double borderRadius;
   late final Offset targetWidgetPos;
 
   CustomDialog({
@@ -52,6 +52,7 @@ class CustomDialog extends StatefulWidget {
     this.distanceBetweenTargetWidget = 0,
     this.adjustSizeWhenKeyboardShow = true,
     this.static = true,
+    this.borderRadius = 10,
   }) {
     safeAreaTopHeight = MediaQueryData.fromView(View.of(context)).padding.top;
   }
@@ -394,7 +395,8 @@ class _CustomDialogState extends State<CustomDialog> {
                         elevation: 0.0,
                         shadowColor: Colors.grey.withOpacity(0.3),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius:
+                              BorderRadius.circular(widget.borderRadius),
                         ),
                         child: AnimatedContainer(
                           duration: Duration(milliseconds: 0),
@@ -402,8 +404,10 @@ class _CustomDialogState extends State<CustomDialog> {
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(10),
-                                bottomRight: Radius.circular(10)),
+                                bottomLeft:
+                                    Radius.circular(widget.borderRadius),
+                                bottomRight:
+                                    Radius.circular(widget.borderRadius)),
                           ),
                           height: dialogHeight,
                           width: dialogWidth,

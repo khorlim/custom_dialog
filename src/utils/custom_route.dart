@@ -55,6 +55,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   final double? maxHeight;
   final double? maxWidth;
 
+  final double borderRadius;
+
   CustomPageRoute({
     required this.builder,
     this.dialogType = DialogType.adaptivePosition,
@@ -84,6 +86,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.isPopupMenu = false,
     this.maxHeight,
     this.maxWidth,
+    this.borderRadius = 10,
   });
 
   @override
@@ -173,6 +176,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
         alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
         enableArrow: enableArrow ?? true,
         targetWidgetContext: targetCtxt,
+        borderRadius: borderRadius,
         onTapOutside: onTapOutside ??
             () {
               if (dismissible == null || dismissible?.value == true) {
@@ -230,6 +234,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
         .chain(CurveTween(curve: Curves.linearToEaseOut));
     var fadeTween = Tween<double>(begin: 0.3, end: 1.0)
         .chain(CurveTween(curve: Curves.linearToEaseOut));
+    var closingFadeTween = Tween<double>(begin: 0, end: 1)
+        .chain(CurveTween(curve: Curves.linearToEaseOut));
 
     var closingSizeTween = Tween<double>(begin: 0.0, end: 1)
         .chain(CurveTween(curve: Curves.easeOutBack));
@@ -247,10 +253,13 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
 
     if (animation.status == AnimationStatus.reverse) {
-      return ScaleTransition(
-        alignment: Alignment(fractionHorizontal, fractionVertical),
-        scale: animation.drive(closingSizeTween),
-        child: child,
+      return FadeTransition(
+        opacity: animation.drive(closingFadeTween),
+        child: ScaleTransition(
+          alignment: Alignment(fractionHorizontal, fractionVertical),
+          scale: animation.drive(closingSizeTween),
+          child: child,
+        ),
       );
     }
 
