@@ -82,6 +82,12 @@ class PositionCalculator {
     double topPos = topPosCalcualor.getAlignBottom();
     return Offset(leftPos, topPos);
   }
+
+  Offset getAlignTargetWidgetBottomRight() {
+    double leftPos = leftPosCalcualor.getAlignTopOrBottomRight();
+    double topPos = topPosCalcualor.getAlignTargetWidget();
+    return Offset(leftPos, topPos);
+  }
 }
 
 class LeftPosCalcualor {
@@ -160,6 +166,18 @@ class LeftPosCalcualor {
 
     return leftPos;
   }
+
+  double getAlignTopOrBottomRight() {
+    double leftPos = (targetWidgetPos.dx);
+
+    if (leftPos < 5) {
+      leftPos = 5;
+    } else if ((leftPos + dialogSize.width) > screenSize.width - 5) {
+      leftPos = screenSize.width - dialogSize.width - 5;
+    }
+
+    return leftPos;
+  }
 }
 
 class TopPosCalculator {
@@ -215,6 +233,16 @@ class TopPosCalculator {
         distance +
         (arrowSize?.height ?? 0) -
         screenPaddingTop);
+    return topPos;
+  }
+
+  double getAlignTargetWidget() {
+    double topPos = (targetWidgetPos.dy +
+        // targetWidgetSize.height +
+        distance +
+        (arrowSize?.height ?? 0) -
+        screenPaddingTop -
+        5);
     return topPos;
   }
 

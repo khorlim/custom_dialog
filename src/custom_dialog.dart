@@ -217,6 +217,9 @@ class _CustomDialogState extends State<CustomDialog> {
       case AlignTargetWidget.bottomLeft:
         dialogPos = calculator.getAlignBottomLeft();
         break;
+      case AlignTargetWidget.centerBottomRight:
+        dialogPos = calculator.getAlignTargetWidgetBottomRight();
+        break;
     }
     dialogPos = calculator.preventOverflow(dialogPos);
   }
@@ -287,6 +290,7 @@ class _CustomDialogState extends State<CustomDialog> {
 
       case AlignTargetWidget.bottomLeft ||
             AlignTargetWidget.bottomCenter ||
+            AlignTargetWidget.centerBottomRight ||
             AlignTargetWidget.topCenter:
         if (adjustment != Offset(0, 0)) {
           double y = widget.adjustment.dy;
