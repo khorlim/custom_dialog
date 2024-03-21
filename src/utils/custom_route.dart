@@ -57,6 +57,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
   final double borderRadius;
 
+  final Widget? customDialogBuilder;
+
   CustomPageRoute({
     required this.builder,
     this.dialogType = DialogType.adaptivePosition,
@@ -87,6 +89,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.maxHeight,
     this.maxWidth,
     this.borderRadius = 10,
+    this.customDialogBuilder,
   });
 
   @override
@@ -149,50 +152,53 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       targetCtxt = targetWidgetContext;
     }
 
-    Widget dialog = OrientationBuilder(builder: (context, orientation) {
-      if (orientation == Orientation.portrait) {
-        manaulDialogHeight = screenHeight * (heightRatioInPortrait ?? 0.5);
-        manualDialogWidth = screenWidth * (widthRatioInPortrait ?? 0.8);
-      }
+    Widget dialog = customDialogBuilder ??
+        OrientationBuilder(builder: (context, orientation) {
+          if (orientation == Orientation.portrait) {
+            manaulDialogHeight = screenHeight * (heightRatioInPortrait ?? 0.5);
+            manualDialogWidth = screenWidth * (widthRatioInPortrait ?? 0.8);
+          }
 
-      if (maxHeight != null && manaulDialogHeight > maxHeight!) {
-        //  debugPrint('using max height : $maxHeight');
-        manaulDialogHeight = maxHeight!;
-      }
-      if (maxWidth != null && manualDialogWidth > maxWidth!) {
-        // debugPrint('using max width : $maxWidth');
-        manualDialogWidth = maxWidth!;
-      }
+          if (maxHeight != null && manaulDialogHeight > maxHeight!) {
+            //  debugPrint('using max height : $maxHeight');
+            manaulDialogHeight = maxHeight!;
+          }
+          if (maxWidth != null && manualDialogWidth > maxWidth!) {
+            // debugPrint('using max width : $maxWidth');
+            manualDialogWidth = maxWidth!;
+          }
 
-      return CustomDialog(
-        context: context,
-        distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
-        height: height ??
-            ((heightRatio != null || isCenterDialog)
-                ? manaulDialogHeight
-                : null),
-        width: width ??
-            ((widthRatio != null || isCenterDialog) ? manualDialogWidth : null),
-        alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
-        enableArrow: enableArrow ?? true,
-        targetWidgetContext: targetCtxt,
-        borderRadius: borderRadius,
-        onTapOutside: onTapOutside ??
-            () {
-              if (dismissible == null || dismissible?.value == true) {
-                Navigator.pop(context);
-                return;
-              }
-            },
-        adjustment: adjustment ?? Offset.zero,
-        showOverFlowArrow: showOverFlowArrow ?? true,
-        overflowLeft: overflowLeft ?? 0,
-        followArrow: followArrow ?? false,
-        pushDialogAboveWhenKeyboardShow:
-            pushDialogAboveWhenKeyboardShow ?? false,
-        child: builder(context),
-      );
-    });
+          return CustomDialog(
+            context: context,
+            distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
+            height: height ??
+                ((heightRatio != null || isCenterDialog)
+                    ? manaulDialogHeight
+                    : null),
+            width: width ??
+                ((widthRatio != null || isCenterDialog)
+                    ? manualDialogWidth
+                    : null),
+            alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
+            enableArrow: enableArrow ?? true,
+            targetWidgetContext: targetCtxt,
+            borderRadius: borderRadius,
+            onTapOutside: onTapOutside ??
+                () {
+                  if (dismissible == null || dismissible?.value == true) {
+                    Navigator.pop(context);
+                    return;
+                  }
+                },
+            adjustment: adjustment ?? Offset.zero,
+            showOverFlowArrow: showOverFlowArrow ?? true,
+            overflowLeft: overflowLeft ?? 0,
+            followArrow: followArrow ?? false,
+            pushDialogAboveWhenKeyboardShow:
+                pushDialogAboveWhenKeyboardShow ?? false,
+            child: builder(context),
+          );
+        });
 
     return DisplayFeatureSubScreen(
       child: showModalBottom ? modalBottomSheet : dialog,

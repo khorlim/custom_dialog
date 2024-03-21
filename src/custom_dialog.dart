@@ -11,7 +11,6 @@ class CustomDialog extends StatefulWidget {
   final BuildContext context;
   final double? height;
   final double? width;
-
   final Widget? appBar;
   final Widget child;
   final BuildContext? targetWidgetContext;
@@ -167,6 +166,15 @@ class _CustomDialogState extends State<CustomDialog> {
   @override
   void didUpdateWidget(covariant CustomDialog oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    if (widget.height != oldWidget.height || widget.width != oldWidget.width) {
+      getDialogHeight(MediaQuery.of(widget.context).orientation);
+      getDialogWidth(MediaQuery.of(widget.context).orientation);
+
+      updateRenderBox();
+      updateDialogPos(widget.context);
+      setState(() {});
+    }
   }
 
   @override
@@ -403,7 +411,7 @@ class _CustomDialogState extends State<CustomDialog> {
                               BorderRadius.circular(widget.borderRadius),
                         ),
                         child: AnimatedContainer(
-                          duration: Duration(milliseconds: 0),
+                          duration: 200.ms,
                           clipBehavior: Clip.antiAlias,
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
