@@ -2,19 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:tunaipro/share_code/custom_dialog/src/custom_dialog.dart';
 import 'package:tunaipro/share_code/custom_dialog/src/utils/custom_route.dart';
 import 'package:tunaipro/theme/responsive/device_type.dart';
-import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
 
 /*
   DialogManager: A class for managing and displaying dialogs.
   Example Usage:
   
-  // Example 1: Show a basic dialog
+  ? Example 1: Show a basic dialog
   DialogManager(
     context: context,
     child: YourDialogContentWidget(),
   ).show();
 
-  // Example 2: Show a dialog with an app bar and custom width
+  ? Example 2: Show a dialog with an app bar and custom width
   DialogManager(
     context: context,
     child: YourDialogContentWidget(),
@@ -22,7 +21,7 @@ import 'package:wolt_modal_sheet/wolt_modal_sheet.dart';
     width: 500,
   ).show();
 
-  // Example 3: Show a dialog with arrow pointing to a target widget
+  ? Example 3: Show a dialog with arrow pointing to a target widget
   DialogManager(
     context: context,
     child: YourDialogContentWidget(),
@@ -52,45 +51,45 @@ enum DialogShape {
   Size getLandscapeRatioSize() {
     switch (this) {
       case DialogShape.slimRectangle:
-        return Size(0.36, 0.82);
+        return const Size(0.36, 0.82);
       case DialogShape.regularRectangle:
-        return Size(0.43, 0.82);
+        return const Size(0.43, 0.82);
       case DialogShape.fatRectangle:
-        return Size(0.5, 0.82);
+        return const Size(0.5, 0.82);
       case DialogShape.obesityRectangle:
-        return Size(0.63, 0.82);
+        return const Size(0.63, 0.82);
       case DialogShape.expandedRectangle:
-        return Size(0.8, 0.82);
+        return const Size(0.8, 0.82);
     }
   }
 
   Size getPortraitRatioSize() {
     switch (this) {
       case DialogShape.slimRectangle:
-        return Size(0.55, 0.6);
+        return const Size(0.55, 0.6);
       case DialogShape.regularRectangle:
-        return Size(0.65, 0.6);
+        return const Size(0.65, 0.6);
       case DialogShape.fatRectangle:
-        return Size(0.7, 0.6);
+        return const Size(0.7, 0.6);
       case DialogShape.obesityRectangle:
-        return Size(0.75, 0.6);
+        return const Size(0.75, 0.6);
       case DialogShape.expandedRectangle:
-        return Size(0.9, 0.7);
+        return const Size(0.9, 0.7);
     }
   }
 
   Size getMaxSize() {
     switch (this) {
       case DialogShape.slimRectangle:
-        return Size(430, 650);
+        return const Size(430, 650);
       case DialogShape.regularRectangle:
-        return Size(520, 650);
+        return const Size(520, 650);
       case DialogShape.fatRectangle:
-        return Size(600, 650);
+        return const Size(600, 650);
       case DialogShape.obesityRectangle:
-        return Size(800, 650);
+        return const Size(800, 650);
       case DialogShape.expandedRectangle:
-        return Size(1500, 800);
+        return const Size(1500, 800);
     }
   }
 }
