@@ -411,7 +411,7 @@ class _CustomDialogState extends State<CustomDialog> {
                               BorderRadius.circular(widget.borderRadius),
                         ),
                         child: AnimatedContainer(
-                          duration: 200.ms,
+                          duration: 50.ms,
                           clipBehavior: Clip.antiAlias,
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
