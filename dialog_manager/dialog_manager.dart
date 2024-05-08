@@ -199,10 +199,16 @@ class DialogManager {
     Size landscapeRatioSize = dialogShape.getLandscapeRatioSize();
     Size portraitRatioSize = dialogShape.getPortraitRatioSize();
     Size maxSize = dialogShape.getMaxSize();
+    final GlobalKey contentBuilderKey = GlobalKey();
     return Navigator.push(
         context,
         CustomPageRoute(
-          builder: (context) => child,
+          builder: (context) => Builder(
+            key: contentBuilderKey,
+            builder: (context) {
+              return child;
+            },
+          ),
           dialogType: dialogType,
           width: width,
           height: height,
