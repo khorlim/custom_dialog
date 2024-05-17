@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:tunaipro/share_code/custom_dialog/src/custom_dialog.dart';
+import 'package:tunaipro/share_code/custom_dialog/src/custom_position_dialog.dart';
 import 'package:tunaipro/share_code/custom_dialog/src/utils/custom_modal_bottom_sheet.dart';
 import 'package:tunaipro/share_code/custom_dialog/dialog_manager/dialog_manager.dart';
 import 'package:tunaipro/theme/responsive/device_type.dart';
@@ -58,6 +59,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   final double borderRadius;
 
   final Widget? customDialogBuilder;
+  final GlobalKey? targetWidgetKey;
 
   CustomPageRoute({
     required this.builder,
@@ -90,6 +92,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.maxWidth,
     this.borderRadius = 10,
     this.customDialogBuilder,
+    this.targetWidgetKey,
   });
 
   @override
@@ -166,6 +169,39 @@ class CustomPageRoute<T> extends PopupRoute<T> {
           if (maxWidth != null && manualDialogWidth > maxWidth!) {
             // debugPrint('using max width : $maxWidth');
             manualDialogWidth = maxWidth!;
+          }
+
+          if (targetWidgetKey != null) {
+            return CustomPositionDialog(
+              targetWidgetKey: targetWidgetKey!,
+              context: context,
+              distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
+              height: height ??
+                  ((heightRatio != null || isCenterDialog)
+                      ? manaulDialogHeight
+                      : null),
+              width: width ??
+                  ((widthRatio != null || isCenterDialog)
+                      ? manualDialogWidth
+                      : null),
+              alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
+              enableArrow: enableArrow ?? true,
+              borderRadius: borderRadius,
+              onTapOutside: onTapOutside ??
+                  () {
+                    if (dismissible == null || dismissible?.value == true) {
+                      Navigator.pop(context);
+                      return;
+                    }
+                  },
+              adjustment: adjustment ?? Offset.zero,
+              showOverFlowArrow: showOverFlowArrow ?? true,
+              overflowLeft: overflowLeft ?? 0,
+              followArrow: followArrow ?? false,
+              pushDialogAboveWhenKeyboardShow:
+                  pushDialogAboveWhenKeyboardShow ?? false,
+              child: builder(context),
+            );
           }
 
           return CustomDialog(

@@ -166,6 +166,8 @@ class DialogManager {
 
   final ValueNotifier<bool>? dismissible;
 
+  final GlobalKey? targetWidgetKey;
+
   // Constructor with required parameters and optional parameters with default values
   DialogManager({
     required this.context,
@@ -190,6 +192,7 @@ class DialogManager {
     this.keepDialogOnMobile = false,
     this.dialogShape = DialogShape.slimRectangle,
     this.dismissible,
+    this.targetWidgetKey,
   }) : deviceType = getDeviceType(context);
 
   final pageIndexNotifier = ValueNotifier(0);
@@ -233,6 +236,7 @@ class DialogManager {
           widthRatioInPortrait: portraitRatioSize.width,
           maxHeight: maxSize.height,
           maxWidth: maxSize.width,
+          targetWidgetKey: targetWidgetKey,
         ));
 
     // if (dialogType == DialogType.modalBottomSheet) {

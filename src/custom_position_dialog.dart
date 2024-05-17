@@ -3,17 +3,15 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:tunaipro/share_code/custom_dialog/src/utils/position_calculator.dart';
 import 'package:tunaipro/share_code/keyboard_size_provider/keyboard_size_provider.dart';
 import 'dart:ui' as ui;
+import 'custom_dialog.dart';
 import 'triangle.dart';
 
-part 'enum.dart';
-
-class CustomDialog extends StatefulWidget {
+class CustomPositionDialog extends StatefulWidget {
   final BuildContext context;
   final double? height;
   final double? width;
   final Widget? appBar;
   final Widget child;
-  final BuildContext? targetWidgetContext;
   final AlignTargetWidget alignTargetWidget;
   final bool enableArrow;
   final double arrowWidth;
@@ -29,9 +27,9 @@ class CustomDialog extends StatefulWidget {
   final bool static;
   final double borderRadius;
   late final Offset targetWidgetPos;
-  final GlobalKey? targetWidgetKey;
+  final GlobalKey targetWidgetKey;
 
-  CustomDialog({
+  CustomPositionDialog({
     super.key,
     required this.context,
     required this.child,
@@ -42,7 +40,6 @@ class CustomDialog extends StatefulWidget {
     this.enableArrow = false,
     this.arrowWidth = 30,
     this.arrowHeight = 15,
-    this.targetWidgetContext,
     this.onTapOutside,
     this.adjustment = const Offset(0, 0),
     this.showOverFlowArrow = true,
@@ -53,7 +50,7 @@ class CustomDialog extends StatefulWidget {
     this.adjustSizeWhenKeyboardShow = true,
     this.static = true,
     this.borderRadius = 10,
-    this.targetWidgetKey,
+    required this.targetWidgetKey,
   }) {
     safeAreaTopHeight = MediaQueryData.fromView(View.of(context)).padding.top;
   }
@@ -61,10 +58,10 @@ class CustomDialog extends StatefulWidget {
   late final double safeAreaTopHeight;
 
   @override
-  State<CustomDialog> createState() => _CustomDialogState();
+  State<CustomPositionDialog> createState() => _CustomPositionDialogState();
 }
 
-class _CustomDialogState extends State<CustomDialog> {
+class _CustomPositionDialogState extends State<CustomPositionDialog> {
   late AlignTargetWidget alignTargetWidget = widget.alignTargetWidget;
   late bool static = widget.static;
   late bool enableArrow = widget.enableArrow;
@@ -88,17 +85,8 @@ class _CustomDialogState extends State<CustomDialog> {
   late Orientation oldOrientation;
 
   void updateDialogPos(BuildContext context, {bool forceCenter = false}) {
-    if (targetWidgetRBox != null && !forceCenter) {
-      calculatePos(alignTargetWidget, context);
-      calculateArrowPos(alignTargetWidget, context);
-    } else {
-      //Default position (center)
-      enableArrow = false;
-      double middleTopPos =
-          (screenHeight / 2) - (dialogHeight / 2) - widget.safeAreaTopHeight;
-      double middleLeftPos = (screenWidth / 2) - (dialogWidth / 2);
-      dialogPos = Offset(middleLeftPos, middleTopPos);
-    }
+    calculatePos(alignTargetWidget, context);
+    calculateArrowPos(alignTargetWidget, context);
   }
 
   void getDialogHeight(Orientation orientation) {
@@ -126,19 +114,12 @@ class _CustomDialogState extends State<CustomDialog> {
   }
 
   void updateRenderBox() {
-    if (widget.targetWidgetContext != null &&
-        (widget.targetWidgetContext!.mounted)) {
-      targetWidgetRBox =
-          widget.targetWidgetContext?.findRenderObject() as RenderBox?;
+    targetWidgetRBox =
+        widget.targetWidgetKey.currentContext!.findRenderObject() as RenderBox;
 
-      targetWidgetSize = targetWidgetRBox?.size;
+    targetWidgetSize = targetWidgetRBox!.size;
 
-      targetWidgetPos = targetWidgetRBox?.localToGlobal(Offset.zero);
-    } else {
-      targetWidgetRBox = null;
-      targetWidgetSize = null;
-      targetWidgetPos = null;
-    }
+    targetWidgetPos = targetWidgetRBox!.localToGlobal(Offset.zero);
   }
 
   @override
@@ -157,7 +138,7 @@ class _CustomDialogState extends State<CustomDialog> {
         Future.delayed(Duration(milliseconds: 300), () {
           if (mounted) {
             setState(() {
-              enableArrow = widget.targetWidgetContext != null ? true : false;
+              enableArrow = true;
             });
           }
         });
@@ -166,17 +147,17 @@ class _CustomDialogState extends State<CustomDialog> {
   }
 
   @override
-  void didUpdateWidget(covariant CustomDialog oldWidget) {
+  void didUpdateWidget(covariant CustomPositionDialog oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget.height != oldWidget.height || widget.width != oldWidget.width) {
-      getDialogHeight(MediaQuery.of(widget.context).orientation);
-      getDialogWidth(MediaQuery.of(widget.context).orientation);
+    getDialogHeight(MediaQuery.of(widget.context).orientation);
+    getDialogWidth(MediaQuery.of(widget.context).orientation);
 
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       updateRenderBox();
       updateDialogPos(widget.context);
       setState(() {});
-    }
+    });
   }
 
   @override
