@@ -283,7 +283,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
         .chain(CurveTween(curve: Curves.easeOutBack));
 
     RenderBox? renderBox =
-        targetWidgetContext?.findRenderObject() as RenderBox?;
+        (targetWidgetKey?.currentContext?.findRenderObject() ??
+            targetWidgetContext?.findRenderObject()) as RenderBox?;
     Size size = renderBox?.size ?? Size.zero;
     Offset targetPosition =
         renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
