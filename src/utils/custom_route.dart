@@ -353,20 +353,21 @@ class CustomPageRoute<T> extends PopupRoute<T> {
         .chain(CurveTween(curve: Curves.linearToEaseOut));
     final Animatable<double> closeScaleTween = Tween<double>(begin: 0.9, end: 1)
         .chain(CurveTween(curve: Curves.linearToEaseOut));
+    final Animatable<Offset> slideTween = Tween<Offset>(
+      begin: const Offset(0.0, 0.2),
+      end: Offset.zero,
+    ).chain(CurveTween(curve: Curves.linearToEaseOut));
     if (animation.status == AnimationStatus.reverse) {
-      return ScaleTransition(
-        scale: animation.drive(closeScaleTween),
-        child: FadeTransition(
-          opacity: fadeAnimation,
-          child: child,
-        ),
+      return FadeTransition(
+        opacity: fadeAnimation,
+        child: child,
       );
     }
 
-    return FadeTransition(
-      opacity: fadeAnimation,
-      child: ScaleTransition(
-        scale: animation.drive(scaleTween),
+    return SlideTransition(
+      position: animation.drive(slideTween),
+      child: FadeTransition(
+        opacity: fadeAnimation,
         child: child,
       ),
     );
