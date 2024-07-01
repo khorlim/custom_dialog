@@ -316,6 +316,30 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     );
   }
 
+  // Widget buildDialogTransition(
+  //     BuildContext context,
+  //     Animation<double> animation,
+  //     Animation<double> secondaryAnimation,
+  //     Widget child) {
+  //   final CurvedAnimation fadeAnimation = CurvedAnimation(
+  //     parent: animation,
+  //     curve: Curves.fastLinearToSlowEaseIn,
+  //   );
+  //   if (animation.status == AnimationStatus.reverse) {
+  //     return FadeTransition(
+  //       opacity: fadeAnimation,
+  //       child: child,
+  //     );
+  //   }
+
+  //   return FadeTransition(
+  //     opacity: fadeAnimation,
+  //     child: ScaleTransition(
+  //       scale: animation.drive(_dialogScaleTween),
+  //       child: child,
+  //     ),
+  //   );
+  // }
   Widget buildDialogTransition(
       BuildContext context,
       Animation<double> animation,
@@ -325,25 +349,29 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       parent: animation,
       curve: Curves.fastLinearToSlowEaseIn,
     );
+    final Animatable<double> scaleTween = Tween<double>(begin: 0.5, end: 1.0)
+        .chain(CurveTween(curve: Curves.linearToEaseOut));
+    final Animatable<double> closeScaleTween = Tween<double>(begin: 0.9, end: 1)
+        .chain(CurveTween(curve: Curves.linearToEaseOut));
     if (animation.status == AnimationStatus.reverse) {
-      return FadeTransition(
-        opacity: fadeAnimation,
-        child: child,
+      return ScaleTransition(
+        scale: animation.drive(closeScaleTween),
+        child: FadeTransition(
+          opacity: fadeAnimation,
+          child: child,
+        ),
       );
     }
 
     return FadeTransition(
       opacity: fadeAnimation,
       child: ScaleTransition(
-        scale: animation.drive(_dialogScaleTween),
+        scale: animation.drive(scaleTween),
         child: child,
       ),
     );
   }
 
-  final Animatable<double> _dialogScaleTween =
-      Tween<double>(begin: 1.3, end: 1.0)
-          .chain(CurveTween(curve: Curves.linearToEaseOut));
   @override
   bool get barrierDismissible => false;
 }
