@@ -316,30 +316,6 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     );
   }
 
-  // Widget buildDialogTransition(
-  //     BuildContext context,
-  //     Animation<double> animation,
-  //     Animation<double> secondaryAnimation,
-  //     Widget child) {
-  //   final CurvedAnimation fadeAnimation = CurvedAnimation(
-  //     parent: animation,
-  //     curve: Curves.fastLinearToSlowEaseIn,
-  //   );
-  //   if (animation.status == AnimationStatus.reverse) {
-  //     return FadeTransition(
-  //       opacity: fadeAnimation,
-  //       child: child,
-  //     );
-  //   }
-
-  //   return FadeTransition(
-  //     opacity: fadeAnimation,
-  //     child: ScaleTransition(
-  //       scale: animation.drive(_dialogScaleTween),
-  //       child: child,
-  //     ),
-  //   );
-  // }
   Widget buildDialogTransition(
       BuildContext context,
       Animation<double> animation,
@@ -349,14 +325,9 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       parent: animation,
       curve: Curves.fastLinearToSlowEaseIn,
     );
-    final Animatable<double> scaleTween = Tween<double>(begin: 0.5, end: 1.0)
-        .chain(CurveTween(curve: Curves.linearToEaseOut));
-    final Animatable<double> closeScaleTween = Tween<double>(begin: 0.9, end: 1)
-        .chain(CurveTween(curve: Curves.linearToEaseOut));
-    final Animatable<Offset> slideTween = Tween<Offset>(
-      begin: const Offset(0.0, 0.2),
-      end: Offset.zero,
-    ).chain(CurveTween(curve: Curves.linearToEaseOut));
+    final Animatable<double> _dialogScaleTween =
+        Tween<double>(begin: 1.2, end: 1.0)
+            .chain(CurveTween(curve: Curves.linearToEaseOut));
     if (animation.status == AnimationStatus.reverse) {
       return FadeTransition(
         opacity: fadeAnimation,
@@ -364,14 +335,46 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       );
     }
 
-    return SlideTransition(
-      position: animation.drive(slideTween),
-      child: FadeTransition(
-        opacity: fadeAnimation,
+    return FadeTransition(
+      opacity: fadeAnimation,
+      child: ScaleTransition(
+        scale: animation.drive(_dialogScaleTween),
         child: child,
       ),
     );
   }
+  // Widget buildDialogTransition(
+  //     BuildContext context,
+  //     Animation<double> animation,
+  //     Animation<double> secondaryAnimation,
+  //     Widget child) {
+  //   final CurvedAnimation fadeAnimation = CurvedAnimation(
+  //     parent: animation,
+  //     curve: Curves.fastLinearToSlowEaseIn,
+  //   );
+  //   final Animatable<double> scaleTween = Tween<double>(begin: 0.5, end: 1.0)
+  //       .chain(CurveTween(curve: Curves.linearToEaseOut));
+  //   final Animatable<double> closeScaleTween = Tween<double>(begin: 0.9, end: 1)
+  //       .chain(CurveTween(curve: Curves.linearToEaseOut));
+  //   final Animatable<Offset> slideTween = Tween<Offset>(
+  //     begin: const Offset(0.0, 0.2),
+  //     end: Offset.zero,
+  //   ).chain(CurveTween(curve: Curves.linearToEaseOut));
+  //   if (animation.status == AnimationStatus.reverse) {
+  //     return FadeTransition(
+  //       opacity: fadeAnimation,
+  //       child: child,
+  //     );
+  //   }
+
+  //   return SlideTransition(
+  //     position: animation.drive(slideTween),
+  //     child: FadeTransition(
+  //       opacity: fadeAnimation,
+  //       child: child,
+  //     ),
+  //   );
+  // }
 
   @override
   bool get barrierDismissible => false;
