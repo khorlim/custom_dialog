@@ -5,8 +5,8 @@ import 'package:tunaipro/share_code/custom_dialog/src/custom_dialog.dart';
 import 'package:tunaipro/share_code/custom_dialog/src/custom_position_dialog.dart';
 import 'package:tunaipro/share_code/custom_dialog/src/utils/custom_modal_bottom_sheet.dart';
 import 'package:tunaipro/share_code/custom_dialog/dialog_manager/dialog_manager.dart';
-import 'package:tunaipro/theme/responsive/device_type.dart';
-import 'package:tunaipro/theme/app_style.dart';
+import 'package:tunaipro/tunai_style/old/theme/responsive/device_type.dart';
+import 'package:tunaipro/tunai_style/old/theme/app_style.dart';
 
 class CustomPageRoute<T> extends PopupRoute<T> {
   final WidgetBuilder builder;
