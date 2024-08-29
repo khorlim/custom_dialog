@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:tunaipro/share_code/custom_dialog/custom_dialog.dart';
-import 'package:tunaipro/share_code/custom_dialog/src/utils/custom_route.dart';
+import '../../custom_dialog.dart';
+import 'custom_route.dart';
 
 Future<T?> showSizeableDialog<T>({
   required BuildContext context,
