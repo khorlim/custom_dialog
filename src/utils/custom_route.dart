@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
 import '../custom_dialog.dart';
 import '../custom_position_dialog.dart';
 import 'custom_modal_bottom_sheet.dart';
