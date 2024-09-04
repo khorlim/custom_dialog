@@ -5,7 +5,7 @@ import '../custom_position_dialog.dart';
 import 'custom_modal_bottom_sheet.dart';
 import '../../dialog_manager/dialog_manager.dart';
 import '../../../../tunai_style/old/theme/responsive/device_type.dart';
-import '../../../../tunai_style/old/theme/app_style.dart';
+import '../../../../tunai_style/old/theme/old_app_style.dart';
 
 class CustomPageRoute<T> extends PopupRoute<T> {
   final WidgetBuilder builder;
