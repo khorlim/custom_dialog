@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../src/custom_dialog.dart';
 import '../src/utils/custom_route.dart';
-import '../../../tunai_style/old/theme/responsive/device_type.dart';
+import '../../../tunai_style/responsive/device_type.dart';
 
 /*
   DialogManager: A class for managing and displaying dialogs.
