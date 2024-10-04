@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'utils/position_calculator.dart';
-import '../../keyboard_size_provider/keyboard_size_provider.dart';
+import '../../dump/keyboard_size_provider/keyboard_size_provider.dart';
 import 'dart:ui' as ui;
 import 'triangle.dart';
 
