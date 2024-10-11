@@ -38,7 +38,7 @@ class NewDialogState extends State<NewDialog> {
   @override
   void initState() {
     super.initState();
-    calculatePos(dialogSize);
+    _calculatePos(dialogSize);
   }
 
   @override
@@ -51,7 +51,7 @@ class NewDialogState extends State<NewDialog> {
     super.didChangeDependencies();
   }
 
-  void calculatePos(Size dialogSize) {
+  void _calculatePos(Size dialogSize) {
     final RenderBox renderBox =
         widget.targetWidgetKey.currentContext!.findRenderObject() as RenderBox;
     PositionCalculator calculator = PositionCalculator(
@@ -101,10 +101,15 @@ class NewDialogState extends State<NewDialog> {
     dialogPos = calculator.preventOverflow(dialogPos);
   }
 
-  void updateDialogSize(Size size) {
+  void updateSize(Size size) {
     dialogSize = size;
-    calculatePos(size);
+    _calculatePos(size);
 
+    setState(() {});
+  }
+
+  void reposition() {
+    _calculatePos(dialogSize);
     setState(() {});
   }
 
