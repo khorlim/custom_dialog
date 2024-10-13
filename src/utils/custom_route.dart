@@ -232,6 +232,11 @@ class CustomPageRoute<T> extends PopupRoute<T> {
             pushDialogAboveWhenKeyboardShow:
                 pushDialogAboveWhenKeyboardShow ?? false,
             child: builder(context),
+            onDismiss: () {
+              if (dismissible != null) {
+                dismissible?.dispose();
+              }
+            },
           );
         });
 

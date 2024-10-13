@@ -30,6 +30,7 @@ class CustomDialog extends StatefulWidget {
   final double borderRadius;
   late final Offset targetWidgetPos;
   final GlobalKey? targetWidgetKey;
+  final void Function()? onDismiss;
 
   CustomDialog({
     super.key,
@@ -54,6 +55,7 @@ class CustomDialog extends StatefulWidget {
     this.static = true,
     this.borderRadius = 10,
     this.targetWidgetKey,
+    this.onDismiss,
   }) {
     safeAreaTopHeight = MediaQueryData.fromView(View.of(context)).padding.top;
   }
@@ -483,6 +485,7 @@ class _CustomDialogState extends State<CustomDialog> {
   @override
   void dispose() {
     isKeyboardVisibleNotifier.dispose();
+    widget.onDismiss?.call();
     super.dispose();
   }
 
