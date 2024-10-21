@@ -38,7 +38,11 @@ enum DialogType {
   position,
   modalBottomSheet,
   adaptivePosition,
-  adaptiveCenter
+  adaptiveCenter,
+  ;
+
+  bool get isPosition =>
+      this == DialogType.position || this == DialogType.adaptivePosition;
 }
 
 enum DialogShape {

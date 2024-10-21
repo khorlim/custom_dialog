@@ -398,18 +398,19 @@ class _CustomDialogState extends State<CustomDialog> {
                         : dialogPos.dy,
                     left: dialogPos.dx,
                     child: Container(
-                      decoration: BoxDecoration(boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.15),
-                          spreadRadius: 20,
-                          blurRadius: 30,
-                          offset: Offset(0, 0),
-                        ),
-                      ]),
+                      decoration: BoxDecoration(
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.15),
+                            spreadRadius: 20,
+                            blurRadius: 30,
+                            offset: Offset(0, 0),
+                          ),
+                        ],
+                      ),
                       child: Material(
                         clipBehavior: Clip.antiAlias,
                         elevation: 0.0,
-                        shadowColor: Colors.grey.withOpacity(0.3),
                         shape: RoundedRectangleBorder(
                           borderRadius:
                               BorderRadius.circular(widget.borderRadius),
@@ -420,10 +421,9 @@ class _CustomDialogState extends State<CustomDialog> {
                           padding: EdgeInsets.zero,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.only(
-                                bottomLeft:
-                                    Radius.circular(widget.borderRadius),
-                                bottomRight:
-                                    Radius.circular(widget.borderRadius)),
+                              bottomLeft: Radius.circular(widget.borderRadius),
+                              bottomRight: Radius.circular(widget.borderRadius),
+                            ),
                           ),
                           height: dialogHeight,
                           width: dialogWidth,
