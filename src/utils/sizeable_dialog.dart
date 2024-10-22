@@ -12,7 +12,7 @@ Future<T?> showSizeableDialog<T>({
     CustomPageRoute(
         isPopupMenu: true,
         targetWidgetContext: context,
-        builder: (context) => SizedBox.shrink(),
+        builder: (context) => const SizedBox.shrink(),
         customDialogBuilder: CheckSizeBuilder(
             child: child,
             builder: (context, size) {
@@ -20,7 +20,7 @@ Future<T?> showSizeableDialog<T>({
               return CustomDialog(
                 context: context,
                 height: size!.height,
-                width: size!.width,
+                width: size.width,
                 child: child,
               );
             })),

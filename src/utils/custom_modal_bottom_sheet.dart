@@ -104,7 +104,7 @@ class _ModalBottomSheetState<T> extends State<CustomModalBottomSheet<T>> {
         onDragEnd: handleDragEnd,
       ),
       builder: (BuildContext context, Widget? child) {
-        final double animationValue = animationCurve.transform(
+        animationCurve.transform(
           widget.route.animation!.value,
         );
         return SizedBox(
