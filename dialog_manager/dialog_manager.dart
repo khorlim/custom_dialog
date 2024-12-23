@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core_utils/tunai_navigator/tunai_navigator.dart';
 import '../src/custom_dialog.dart';
 import '../src/utils/custom_route.dart';
 import '../../../tunai_style/responsive/device_type.dart';
@@ -100,7 +101,7 @@ enum DialogShape {
 
 class DialogManager {
   // Context in which the dialog is displayed
-  final BuildContext context;
+  final BuildContext? context;
 
   final DialogType dialogType;
 
@@ -174,7 +175,7 @@ class DialogManager {
 
   // Constructor with required parameters and optional parameters with default values
   DialogManager({
-    required this.context,
+    this.context,
     required this.child,
     this.appBar,
     this.width,
@@ -197,7 +198,7 @@ class DialogManager {
     this.dialogShape = DialogShape.slimRectangle,
     this.dismissible,
     this.targetWidgetKey,
-  }) : deviceType = getDeviceType(context);
+  }) : deviceType = getDeviceType(context ?? TunaiNavigator.currentContext);
 
   final pageIndexNotifier = ValueNotifier(0);
 
@@ -208,7 +209,7 @@ class DialogManager {
     Size maxSize = dialogShape.getMaxSize();
     final GlobalKey contentBuilderKey = GlobalKey();
     return Navigator.push(
-        context,
+        TunaiNavigator.currentContext,
         CustomPageRoute(
           builder: (context) => Builder(
             key: contentBuilderKey,
