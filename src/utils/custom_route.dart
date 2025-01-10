@@ -286,9 +286,16 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     var closingSizeTween = Tween<double>(begin: 0.0, end: 1)
         .chain(CurveTween(curve: Curves.easeOutBack));
 
-    RenderBox? renderBox =
-        (targetWidgetKey?.currentContext?.findRenderObject() ??
-            targetWidgetContext?.findRenderObject()) as RenderBox?;
+    RenderBox? renderBox;
+    if (targetWidgetKey != null &&
+        targetWidgetKey?.currentContext != null &&
+        targetWidgetKey!.currentContext!.mounted) {
+      renderBox =
+          targetWidgetKey?.currentContext?.findRenderObject() as RenderBox?;
+    } else if (targetWidgetContext != null && targetWidgetContext!.mounted) {
+      renderBox = targetWidgetContext?.findRenderObject() as RenderBox?;
+    }
+
     Size size = renderBox?.size ?? Size.zero;
     Offset targetPosition =
         renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
