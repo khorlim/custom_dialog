@@ -4,11 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'custom_route.dart';
 
-const Duration _bottomSheetEnterDuration = Duration(milliseconds: 250);
-const Duration _bottomSheetExitDuration = Duration(milliseconds: 200);
-const Curve _modalBottomSheetCurve = decelerateEasing;
-const double _minFlingVelocity = 700.0;
-const double _closeProgressThreshold = 0.5;
+const Curve _modalBottomSheetCurve = Easing.standardDecelerate;
 const double _defaultScrollControlDisabledMaxHeightRatio = 9.0 / 16.0;
 
 class CustomModalBottomSheet<T> extends StatefulWidget {
@@ -58,9 +54,9 @@ class _ModalBottomSheetState<T> extends State<CustomModalBottomSheet<T>> {
     }
   }
 
-  EdgeInsets _getNewClipDetails(Size topLayerSize) {
-    return EdgeInsets.fromLTRB(0, 0, 0, topLayerSize.height);
-  }
+  // EdgeInsets _getNewClipDetails(Size topLayerSize) {
+  //   return EdgeInsets.fromLTRB(0, 0, 0, topLayerSize.height);
+  // }
 
   void handleDragStart(DragStartDetails details) {
     // Allow the bottom sheet to track the user's finger accurately.
