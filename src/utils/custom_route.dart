@@ -60,6 +60,50 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   final Widget? customDialogBuilder;
   final GlobalKey? targetWidgetKey;
 
+  // Define tweens as static final to avoid recreation
+  static final _sizeTween = Tween<double>(begin: 0.0, end: 1.0)
+      .chain(CurveTween(curve: Curves.linearToEaseOut));
+  static final _fadeTween = Tween<double>(begin: 0.3, end: 1.0)
+      .chain(CurveTween(curve: Curves.linearToEaseOut));
+  static final _closingFadeTween = Tween<double>(begin: 0, end: 1)
+      .chain(CurveTween(curve: Curves.linearToEaseOut));
+  static final _closingSizeTween = Tween<double>(begin: 0.0, end: 1)
+      .chain(CurveTween(curve: Curves.easeOutBack));
+
+  // Cache RenderBox calculations
+  RenderBox? _cachedRenderBox;
+  Size? _cachedSize;
+  Offset? _cachedPosition;
+  Alignment? _cachedAlignment;
+
+  void _updateCachedValues(BuildContext context) {
+    RenderBox? renderBox;
+    if (targetWidgetKey != null &&
+        targetWidgetKey?.currentContext != null &&
+        targetWidgetKey!.currentContext!.mounted) {
+      renderBox =
+          targetWidgetKey?.currentContext?.findRenderObject() as RenderBox?;
+    } else if (targetWidgetContext != null && targetWidgetContext!.mounted) {
+      renderBox = targetWidgetContext?.findRenderObject() as RenderBox?;
+    }
+
+    if (renderBox != _cachedRenderBox) {
+      _cachedRenderBox = renderBox;
+      _cachedSize = renderBox?.size ?? Size.zero;
+      _cachedPosition = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
+      
+      Size screenSize = MediaQuery.of(context).size;
+      Offset centerPos = Offset(
+        _cachedPosition!.dx + (_cachedSize!.width / 2),
+        _cachedPosition!.dy + (_cachedSize!.height / 2)
+      );
+      
+      double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
+      double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
+      _cachedAlignment = Alignment(fractionHorizontal, fractionVertical);
+    }
+  }
+
   CustomPageRoute({
     required this.builder,
     this.dialogType = DialogType.adaptivePosition,
@@ -276,52 +320,24 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
   Widget buildPopupTransition(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
-    var sizeTween = Tween<double>(begin: 0.0, end: 1.0)
-        .chain(CurveTween(curve: Curves.linearToEaseOut));
-    var fadeTween = Tween<double>(begin: 0.3, end: 1.0)
-        .chain(CurveTween(curve: Curves.linearToEaseOut));
-    var closingFadeTween = Tween<double>(begin: 0, end: 1)
-        .chain(CurveTween(curve: Curves.linearToEaseOut));
-
-    var closingSizeTween = Tween<double>(begin: 0.0, end: 1)
-        .chain(CurveTween(curve: Curves.easeOutBack));
-
-    RenderBox? renderBox;
-    if (targetWidgetKey != null &&
-        targetWidgetKey?.currentContext != null &&
-        targetWidgetKey!.currentContext!.mounted) {
-      renderBox =
-          targetWidgetKey?.currentContext?.findRenderObject() as RenderBox?;
-    } else if (targetWidgetContext != null && targetWidgetContext!.mounted) {
-      renderBox = targetWidgetContext?.findRenderObject() as RenderBox?;
-    }
-
-    Size size = renderBox?.size ?? Size.zero;
-    Offset targetPosition =
-        renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
-    Offset centerPos = Offset(targetPosition.dx + (size.width / 2),
-        targetPosition.dy + (size.height / 2));
-    Size screenSize = MediaQuery.of(context).size;
-
-    double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
-    double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
+    _updateCachedValues(context);
 
     if (animation.status == AnimationStatus.reverse) {
       return FadeTransition(
-        opacity: animation.drive(closingFadeTween),
+        opacity: animation.drive(_closingFadeTween),
         child: ScaleTransition(
-          alignment: Alignment(fractionHorizontal, fractionVertical),
-          scale: animation.drive(closingSizeTween),
+          alignment: _cachedAlignment!,
+          scale: animation.drive(_closingSizeTween),
           child: child,
         ),
       );
     }
 
     return FadeTransition(
-      opacity: animation.drive(fadeTween),
+      opacity: animation.drive(_fadeTween),
       child: ScaleTransition(
-        alignment: Alignment(fractionHorizontal, fractionVertical),
-        scale: animation.drive(sizeTween),
+        alignment: _cachedAlignment!,
+        scale: animation.drive(_sizeTween),
         child: child,
       ),
     );

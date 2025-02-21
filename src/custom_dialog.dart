@@ -414,23 +414,29 @@ class _CustomDialogState extends State<CustomDialog> {
                           borderRadius:
                               BorderRadius.circular(widget.borderRadius),
                         ),
-                        child: AnimatedContainer(
-                          duration: 50.ms,
-                          clipBehavior: Clip.antiAlias,
-                          padding: EdgeInsets.zero,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(widget.borderRadius),
-                              bottomRight: Radius.circular(widget.borderRadius),
+                        child: TweenAnimationBuilder<double>(
+                          duration: const Duration(milliseconds: 50),
+                          tween: Tween<double>(
+                              begin: oriHeight, end: dialogHeight),
+                          builder: (context, height, child) => Container(
+                            height: height,
+                            width: dialogWidth,
+                            clipBehavior: Clip.antiAlias,
+                            padding: EdgeInsets.zero,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                bottomLeft:
+                                    Radius.circular(widget.borderRadius),
+                                bottomRight:
+                                    Radius.circular(widget.borderRadius),
+                              ),
                             ),
-                          ),
-                          height: dialogHeight,
-                          width: dialogWidth,
-                          child: Column(
-                            children: [
-                              widget.appBar ?? Container(),
-                              Expanded(child: widget.child),
-                            ],
+                            child: Column(
+                              children: [
+                                widget.appBar ?? Container(),
+                                Expanded(child: widget.child),
+                              ],
+                            ),
                           ),
                         ),
                       ),
