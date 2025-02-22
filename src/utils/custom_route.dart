@@ -91,13 +91,11 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       _cachedRenderBox = renderBox;
       _cachedSize = renderBox?.size ?? Size.zero;
       _cachedPosition = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
-      
+
       Size screenSize = MediaQuery.of(context).size;
-      Offset centerPos = Offset(
-        _cachedPosition!.dx + (_cachedSize!.width / 2),
-        _cachedPosition!.dy + (_cachedSize!.height / 2)
-      );
-      
+      Offset centerPos = Offset(_cachedPosition!.dx + (_cachedSize!.width / 2),
+          _cachedPosition!.dy + (_cachedSize!.height / 2));
+
       double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
       double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
       _cachedAlignment = Alignment(fractionHorizontal, fractionVertical);
