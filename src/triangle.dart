@@ -1,14 +1,14 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-//testing testing
+import '../../../core_utils/tunai_navigator/tunai_navigator.dart';
+import '../../../tunai_style/extension/build_context_extension.dart';
 
 class TriangleArrowLeft extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path();
     final paint = Paint()
-      ..color = Colors.white
+      ..color = TunaiNavigator.currentContext.colorScheme.surfaceContainer
       ..style = PaintingStyle.fill;
 
     path
@@ -24,7 +24,6 @@ class TriangleArrowLeft extends CustomPainter {
   bool shouldRepaint(TriangleArrowLeft oldDelegate) => false;
 }
 
-
 class TriangleArrowRight extends CustomPainter {
   TriangleArrowRight();
 
@@ -33,7 +32,7 @@ class TriangleArrowRight extends CustomPainter {
     var paint = Paint()..style = PaintingStyle.fill;
 
     // Draw the triangle itself
-    paint.color = Colors.white;
+    paint.color = TunaiNavigator.currentContext.colorScheme.surfaceContainer;
     var trianglePath = Path();
     trianglePath.moveTo(0, 0);
     trianglePath.lineTo(size.width, size.height / 2);
@@ -51,7 +50,7 @@ class TriangleArrowTop extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final path = Path();
     final paint = Paint()
-      ..color = Colors.white
+      ..color = TunaiNavigator.currentContext.colorScheme.surfaceContainer
       ..style = PaintingStyle.fill;
 
     path
@@ -72,7 +71,7 @@ class TriangleArrowDown extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final path = Path();
     final paint = Paint()
-      ..color = Colors.white
+      ..color = TunaiNavigator.currentContext.colorScheme.surfaceContainer
       ..style = PaintingStyle.fill;
 
     path
