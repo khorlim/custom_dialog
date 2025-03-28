@@ -145,8 +145,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   @override
   String get barrierLabel => 'CustomPageRoute';
 
-  @override
-  bool get maintainState => true;
+  // @override
+  // bool get maintainState => true;
 
   bool get isCenterDialog =>
       dialogType == DialogType.center ||
