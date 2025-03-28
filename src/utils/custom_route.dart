@@ -170,20 +170,22 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       Animation<double> secondaryAnimation) {
     deviceType = getDeviceType(context);
 
-    Widget modalBottomSheet = SafeArea(
-      bottom: false,
-      child: CustomModalBottomSheet(
-        enableDrag: false,
-        route: this,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+    if (showModalBottom) {
+      return SafeArea(
+        bottom: false,
+        child: CustomModalBottomSheet(
+          enableDrag: false,
+          route: this,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
           ),
+          clipBehavior: Clip.antiAlias,
         ),
-        clipBehavior: Clip.antiAlias,
-      ),
-    );
+      );
+    }
 
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -282,9 +284,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
           );
         });
 
-    return DisplayFeatureSubScreen(
-      child: showModalBottom ? modalBottomSheet : dialog,
-    );
+    return dialog;
   }
 
   @override
@@ -307,7 +307,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       Animation<double> secondaryAnimation, Widget child) {
     const begin = Offset(0.0, 1.0);
     const end = Offset.zero;
-    const curve = Curves.linearToEaseOut;
+    const curve = Curves.easeInOut;
 
     var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
