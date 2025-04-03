@@ -296,7 +296,11 @@ class CustomPageRoute<T> extends PopupRoute<T> {
           context, animation, secondaryAnimation, child);
     } else if (isPopupMenu) {
       return buildPopupTransition(
-          context, animation, secondaryAnimation, child);
+        context,
+        animation,
+        secondaryAnimation,
+        child,
+      );
     } else {
       return buildDialogTransition(
           context, animation, secondaryAnimation, child);
@@ -305,15 +309,29 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
   Widget buildSlideTransition(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
-    const begin = Offset(0.0, 1.0);
+    // Use a smoother curve combination for more natural movement
+    const begin = Offset(0.0, 0.3); // Reduced distance for subtler effect
     const end = Offset.zero;
-    const curve = Curves.easeInOut;
+    const curve = Curves.easeOutCubic; // More natural deceleration
+
+    // Add a fade effect to complement the slide
+    final fadeAnimation = CurvedAnimation(
+      parent: animation,
+      curve:
+          Curves.easeOutQuart, // Slightly different curve for visual interest
+    );
 
     var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
     var offsetAnimation = animation.drive(tween);
 
-    return SlideTransition(position: offsetAnimation, child: child);
+    // Combine slide with fade and subtle scale for a polished effect
+    return FadeTransition(
+      opacity: fadeAnimation,
+      child: SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      ),
+    );
   }
 
   Widget buildPopupTransition(BuildContext context, Animation<double> animation,
@@ -346,60 +364,49 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       Animation<double> animation,
       Animation<double> secondaryAnimation,
       Widget child) {
-    final CurvedAnimation fadeAnimation = CurvedAnimation(
+    // Use a combination of animations for a smoother effect
+    final fadeAnimation = CurvedAnimation(
       parent: animation,
-      curve: Curves.fastLinearToSlowEaseIn,
+      curve: Curves.easeOutQuart, // Smoother fade-in curve
+      reverseCurve: Curves.easeInQuart, // Smooth fade-out for reverse
     );
-    final Animatable<double> _dialogScaleTween =
-        Tween<double>(begin: 1.2, end: 1.0)
-            .chain(CurveTween(curve: Curves.linearToEaseOut));
+
+    // Define scale tweens with more natural values
+    final forwardScaleTween = Tween<double>(begin: 0.95, end: 1.0)
+        .chain(CurveTween(curve: Curves.easeOutCubic));
+
+    final reverseScaleTween = Tween<double>(begin: 0.9, end: 1.0)
+        .chain(CurveTween(curve: Curves.easeInOutCubic));
+
+    // Add a subtle slide effect for position dialogs
+    final slideTween = Tween<Offset>(
+      begin: const Offset(0.0, -0.05),
+      end: Offset.zero,
+    ).chain(CurveTween(curve: Curves.easeOutCubic));
+
     if (animation.status == AnimationStatus.reverse) {
+      // Reverse animation (closing dialog)
       return FadeTransition(
         opacity: fadeAnimation,
-        child: child,
+        child: ScaleTransition(
+          scale: animation.drive(reverseScaleTween),
+          child: child,
+        ),
       );
     }
 
+    // Forward animation (opening dialog)
     return FadeTransition(
       opacity: fadeAnimation,
-      child: ScaleTransition(
-        scale: animation.drive(_dialogScaleTween),
-        child: child,
+      child: SlideTransition(
+        position: animation.drive(slideTween),
+        child: ScaleTransition(
+          scale: animation.drive(forwardScaleTween),
+          child: child,
+        ),
       ),
     );
   }
-  // Widget buildDialogTransition(
-  //     BuildContext context,
-  //     Animation<double> animation,
-  //     Animation<double> secondaryAnimation,
-  //     Widget child) {
-  //   final CurvedAnimation fadeAnimation = CurvedAnimation(
-  //     parent: animation,
-  //     curve: Curves.fastLinearToSlowEaseIn,
-  //   );
-  //   final Animatable<double> scaleTween = Tween<double>(begin: 0.5, end: 1.0)
-  //       .chain(CurveTween(curve: Curves.linearToEaseOut));
-  //   final Animatable<double> closeScaleTween = Tween<double>(begin: 0.9, end: 1)
-  //       .chain(CurveTween(curve: Curves.linearToEaseOut));
-  //   final Animatable<Offset> slideTween = Tween<Offset>(
-  //     begin: const Offset(0.0, 0.2),
-  //     end: Offset.zero,
-  //   ).chain(CurveTween(curve: Curves.linearToEaseOut));
-  //   if (animation.status == AnimationStatus.reverse) {
-  //     return FadeTransition(
-  //       opacity: fadeAnimation,
-  //       child: child,
-  //     );
-  //   }
-
-  //   return SlideTransition(
-  //     position: animation.drive(slideTween),
-  //     child: FadeTransition(
-  //       opacity: fadeAnimation,
-  //       child: child,
-  //     ),
-  //   );
-  // }
 
   @override
   bool get barrierDismissible => false;
