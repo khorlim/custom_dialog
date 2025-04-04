@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core_utils/tunai_navigator/tunai_navigator.dart';
 import '../src/custom_dialog.dart';
+import '../src/utils/adaptive_custom_dialog_route.dart';
 import '../src/utils/custom_route.dart';
 import '../../../tunai_style/responsive/device_type.dart';
 
@@ -210,7 +211,7 @@ class DialogManager {
     final GlobalKey contentBuilderKey = GlobalKey();
     return Navigator.push(
         TunaiNavigator.currentContext,
-        CustomPageRoute(
+        AdaptiveDialogRoute(
           builder: (context) => Builder(
             key: contentBuilderKey,
             builder: (context) {
