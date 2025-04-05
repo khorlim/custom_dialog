@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../tunai_style/extension/build_context_extension.dart';
 import 'utils/position_calculator.dart';
 import '../../dump/keyboard_size_provider/keyboard_size_provider.dart';
 import 'triangle.dart';
@@ -396,51 +397,38 @@ class _CustomDialogState extends State<CustomDialog> {
                         ? 10
                         : dialogPos.dy,
                     left: dialogPos.dx,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.15),
-                            spreadRadius: 20,
-                            blurRadius: 30,
-                            offset: Offset(0, 0),
-                          ),
-                        ],
+                    child: Material(
+                      clipBehavior: Clip.antiAlias,
+                      elevation: 0.0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius:
+                            BorderRadius.circular(widget.borderRadius),
                       ),
-                      child: Material(
+                      child: AnimatedContainer(
+                        duration: Duration(milliseconds: 50),
+                        curve: Curves.linearToEaseOut,
+                        height: dialogHeight,
+                        width: dialogWidth,
                         clipBehavior: Clip.antiAlias,
-                        elevation: 0.0,
-                        shape: RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.circular(widget.borderRadius),
-                        ),
-                        child: TweenAnimationBuilder<double>(
-                          duration: const Duration(milliseconds: 50),
-                          tween: Tween<double>(
-                            begin: oriHeight,
-                            end: dialogHeight,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            bottomLeft: Radius.circular(widget.borderRadius),
+                            bottomRight: Radius.circular(widget.borderRadius),
                           ),
-                          child: Column(
-                            children: [
-                              widget.appBar ?? Container(),
-                              Expanded(child: widget.child),
-                            ],
-                          ),
-                          builder: (context, height, child) => Container(
-                            height: height,
-                            width: dialogWidth,
-                            clipBehavior: Clip.antiAlias,
-                            padding: EdgeInsets.zero,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.only(
-                                bottomLeft:
-                                    Radius.circular(widget.borderRadius),
-                                bottomRight:
-                                    Radius.circular(widget.borderRadius),
-                              ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: context.colorScheme.shadow,
+                              spreadRadius: 20,
+                              blurRadius: 30,
+                              offset: Offset(0, 0),
                             ),
-                            child: child,
-                          ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            widget.appBar ?? Container(),
+                            Expanded(child: widget.child),
+                          ],
                         ),
                       ),
                     ),
