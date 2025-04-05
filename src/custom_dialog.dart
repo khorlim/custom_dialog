@@ -389,8 +389,8 @@ class _CustomDialogState extends State<CustomDialog> {
                           },
                   ),
                   AnimatedPositioned(
-                    duration: Duration(milliseconds: 300),
-                    curve: Curves.fastEaseInToSlowEaseOut,
+                    duration: Duration(milliseconds: 200),
+                    curve: Curves.linearToEaseOut,
                     top: isKeyboardVisible &&
                             widget.pushDialogAboveWhenKeyboardShow
                         ? 10
@@ -417,7 +417,15 @@ class _CustomDialogState extends State<CustomDialog> {
                         child: TweenAnimationBuilder<double>(
                           duration: const Duration(milliseconds: 50),
                           tween: Tween<double>(
-                              begin: oriHeight, end: dialogHeight),
+                            begin: oriHeight,
+                            end: dialogHeight,
+                          ),
+                          child: Column(
+                            children: [
+                              widget.appBar ?? Container(),
+                              Expanded(child: widget.child),
+                            ],
+                          ),
                           builder: (context, height, child) => Container(
                             height: height,
                             width: dialogWidth,
@@ -431,12 +439,7 @@ class _CustomDialogState extends State<CustomDialog> {
                                     Radius.circular(widget.borderRadius),
                               ),
                             ),
-                            child: Column(
-                              children: [
-                                widget.appBar ?? Container(),
-                                Expanded(child: widget.child),
-                              ],
-                            ),
+                            child: child,
                           ),
                         ),
                       ),
