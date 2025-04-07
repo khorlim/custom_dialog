@@ -128,19 +128,43 @@ class _CustomDialogState extends State<CustomDialog> {
   }
 
   void updateRenderBox() {
-    if (widget.targetWidgetContext != null &&
-        (widget.targetWidgetContext!.mounted)) {
-      targetWidgetRBox =
-          widget.targetWidgetContext?.findRenderObject() as RenderBox?;
+    try {
+      if (widget.targetWidgetContext != null &&
+          widget.targetWidgetContext!.mounted) {
+        final renderObject = widget.targetWidgetContext?.findRenderObject();
 
-      targetWidgetSize = targetWidgetRBox?.size;
-
-      targetWidgetPos = targetWidgetRBox?.localToGlobal(Offset.zero);
-    } else {
+        // Check if the render object is a RenderBox and has been laid out
+        if (renderObject is RenderBox && renderObject.hasSize) {
+          updateRenderObj(renderObject);
+        } else {
+          // Schedule a post-frame callback to try again after layout
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) {
+              final renderObject =
+                  widget.targetWidgetContext?.findRenderObject();
+              updateRenderObj(renderObject as RenderBox);
+              updateDialogPos(widget.context);
+              setState(() {});
+            }
+          });
+        }
+      } else {
+        targetWidgetRBox = null;
+        targetWidgetSize = null;
+        targetWidgetPos = null;
+      }
+    } catch (e) {
+      debugPrint('Error in updateRenderBox: $e');
       targetWidgetRBox = null;
       targetWidgetSize = null;
       targetWidgetPos = null;
     }
+  }
+
+  void updateRenderObj(RenderObject renderObject) {
+    targetWidgetRBox = renderObject as RenderBox;
+    targetWidgetSize = targetWidgetRBox?.size;
+    targetWidgetPos = targetWidgetRBox?.localToGlobal(Offset.zero);
   }
 
   @override
