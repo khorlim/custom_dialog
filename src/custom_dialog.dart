@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../tunai_style/extension/build_context_extension.dart';
-import 'utils/on_dismiss_mixin.dart';
 import 'utils/position_calculator.dart';
 import '../../dump/keyboard_size_provider/keyboard_size_provider.dart';
 import 'triangle.dart';
