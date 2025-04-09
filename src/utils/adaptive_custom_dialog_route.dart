@@ -59,6 +59,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
 
   final Widget? customDialogBuilder;
   final GlobalKey? targetWidgetKey;
+  final bool enableDrag;
 
   // Define tweens as static final to avoid recreation
   static final _sizeTween = Tween<double>(begin: 0.0, end: 1.0)
@@ -134,6 +135,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
     this.borderRadius = 10,
     this.customDialogBuilder,
     this.targetWidgetKey,
+    this.enableDrag = true,
     super.duration = const Duration(milliseconds: 200),
   });
 
@@ -177,7 +179,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
           secondAnimationController: null,
           expanded: true,
           bounce: false,
-          enableDrag: true,
+          enableDrag: enableDrag,
           animationCurve: animationCurve,
           builder: (context) => ClipRRect(
               borderRadius: const BorderRadius.only(

@@ -433,7 +433,11 @@ class _CustomDialogState extends State<CustomDialog> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              if (isDismissible != null && !isDismissible!) {
+                              if (isDismissible != null) {
+                                if (isDismissible!) {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop();
+                                }
                                 return;
                               }
                               if (widget.onTapOutside != null) {

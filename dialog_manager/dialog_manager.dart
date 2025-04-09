@@ -173,6 +173,8 @@ class DialogManager {
 
   final GlobalKey? targetWidgetKey;
 
+  final bool enableDrag;
+
   // Constructor with required parameters and optional parameters with default values
   DialogManager({
     this.context,
@@ -198,6 +200,7 @@ class DialogManager {
     this.dialogShape = DialogShape.slimRectangle,
     this.dismissible,
     this.targetWidgetKey,
+    this.enableDrag = true,
   }) : deviceType = getDeviceType(context ?? TunaiNavigator.currentContext);
 
   final pageIndexNotifier = ValueNotifier(0);
@@ -217,6 +220,7 @@ class DialogManager {
               return child;
             },
           ),
+          enableDrag: enableDrag,
           dialogType: dialogType,
           width: width,
           height: height,
