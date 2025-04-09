@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../tunai_style/extension/build_context_extension.dart';
+import 'utils/on_dismiss_mixin.dart';
 import 'utils/position_calculator.dart';
 import '../../dump/keyboard_size_provider/keyboard_size_provider.dart';
 import 'triangle.dart';
@@ -87,7 +88,12 @@ class _CustomDialogState extends State<CustomDialog> {
   Offset dialogPos = Offset.zero;
   Offset arrowPos = Offset.zero;
 
+  bool? isDismissible;
+
   late Orientation oldOrientation;
+
+  // Consider memoizing position calculations
+  final _positionCache = <String, Offset>{};
 
   void updateDialogPos(BuildContext context, {bool forceCenter = false}) {
     if (targetWidgetRBox != null && !forceCenter) {
@@ -180,7 +186,7 @@ class _CustomDialogState extends State<CustomDialog> {
     isKeyboardVisibleNotifier.addListener(() {
       if (widget.pushDialogAboveWhenKeyboardShow &&
           !isKeyboardVisibleNotifier.value) {
-        Future.delayed(Duration(milliseconds: 300), () {
+        Future.delayed(const Duration(milliseconds: 300), () {
           if (mounted) {
             setState(() {
               enableArrow = widget.targetWidgetContext != null ? true : false;
@@ -211,6 +217,16 @@ class _CustomDialogState extends State<CustomDialog> {
   }
 
   void calculatePos(AlignTargetWidget alignment, BuildContext context) {
+    // Create a cache key based on relevant parameters
+    final cacheKey =
+        '$alignment-$dialogWidth-$dialogHeight-${targetWidgetPos?.toString()}';
+
+    // Check if we already calculated this position
+    if (_positionCache.containsKey(cacheKey)) {
+      dialogPos = _positionCache[cacheKey]!;
+      return;
+    }
+
     PositionCalculator calculator = PositionCalculator(
       dialogSize: Size(dialogWidth, dialogHeight),
       targetWidgetSize: targetWidgetSize!,
@@ -258,6 +274,9 @@ class _CustomDialogState extends State<CustomDialog> {
         break;
     }
     dialogPos = calculator.preventOverflow(dialogPos);
+
+    // Cache the result
+    _positionCache[cacheKey] = dialogPos;
   }
 
   void calculateArrowPos(AlignTargetWidget alignment, BuildContext context) {
@@ -310,7 +329,7 @@ class _CustomDialogState extends State<CustomDialog> {
             AlignTargetWidget.leftCenter:
 
         //Add adjustment
-        if (adjustment != Offset(0, 0)) {
+        if (adjustment != const Offset(0, 0)) {
           double y = widget.adjustment.dy;
           double x = widget.adjustment.dx;
 
@@ -328,7 +347,7 @@ class _CustomDialogState extends State<CustomDialog> {
             AlignTargetWidget.bottomCenter ||
             AlignTargetWidget.centerBottomRight ||
             AlignTargetWidget.topCenter:
-        if (adjustment != Offset(0, 0)) {
+        if (adjustment != const Offset(0, 0)) {
           double y = widget.adjustment.dy;
           double x = widget.adjustment.dx;
 
@@ -352,154 +371,176 @@ class _CustomDialogState extends State<CustomDialog> {
     // print('-------');
     // print('dialogPos: $dialogPos');
 
-    return OrientationBuilder(builder: (context, orientation) {
-      getDialogHeight(orientation);
-      getDialogWidth(orientation);
+    return DialogDismissible(
+      onUpdate: (isDismissible) {
+        this.isDismissible = isDismissible;
+      },
+      child: OrientationBuilder(
+        builder: (context, orientation) {
+          getDialogHeight(orientation);
+          getDialogWidth(orientation);
 
-      // print('dialogHeight: $dialogHeight, dialogWidth: $dialogWidth');
+          // print('dialogHeight: $dialogHeight, dialogWidth: $dialogWidth');
 
-      //   print('dialog left pos: $dialogPos.dx, dialog top pos: $dialogPos.dy');
+          //   print('dialog left pos: $dialogPos.dx, dialog top pos: $dialogPos.dy');
 
-      if (oldOrientation != orientation) {
-        updateDialogPos(context, forceCenter: true);
-        // Future.delayed(Duration(milliseconds: 500), () {
-        //   if (mounted) {
-        //     setState(() {
-        //       static = false;
-        //       enableArrow = false;
-        //     });
-        //     updateDialogPos();
-        //   }
-        // });
-      }
-      oldOrientation = orientation;
+          if (oldOrientation != orientation) {
+            updateDialogPos(context, forceCenter: true);
+            // Future.delayed(Duration(milliseconds: 500), () {
+            //   if (mounted) {
+            //     setState(() {
+            //       static = false;
+            //       enableArrow = false;
+            //     });
+            //     updateDialogPos();
+            //   }
+            // });
+          }
+          oldOrientation = orientation;
 
-      return KeyboardSizeProvider(
-        child: SafeArea(
-          child:
-              Consumer<ScreenHeight>(builder: (context, screenHeight, child) {
-            bool isKeyboardVisible = screenHeight.isOpen;
-            double paddingWhenKeyboardShow = screenHeight.keyboardHeight;
-            isKeyboardVisibleNotifier.value = isKeyboardVisible;
-            return LayoutBuilder(builder: (context, constraints) {
-              if (isKeyboardVisible) {
-                double screenHeight = constraints.maxHeight;
+          return KeyboardSizeProvider(
+            child: SafeArea(
+              child: Consumer<ScreenHeight>(
+                builder: (context, screenHeight, child) {
+                  bool isKeyboardVisible = screenHeight.isOpen;
+                  double paddingWhenKeyboardShow = screenHeight.keyboardHeight;
+                  isKeyboardVisibleNotifier.value = isKeyboardVisible;
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (isKeyboardVisible) {
+                        double screenHeight = constraints.maxHeight;
 
-                double newHeight = oriHeight -
-                    (paddingWhenKeyboardShow -
-                        (screenHeight - (oriHeight + dialogPos.dy)));
+                        double newHeight = oriHeight -
+                            (paddingWhenKeyboardShow -
+                                (screenHeight - (oriHeight + dialogPos.dy)));
 
-                if (widget.pushDialogAboveWhenKeyboardShow) {
-                  newHeight = oriHeight -
-                      (paddingWhenKeyboardShow -
-                          (screenHeight - (oriHeight + 10)));
-                  enableArrow = false;
-                }
-                if (widget.adjustSizeWhenKeyboardShow) {
-                  if (newHeight <= dialogHeight) {
-                    dialogHeight = newHeight > 0 ? newHeight - 5 : oriHeight;
-                  }
-                }
-              } else {
-                dialogHeight = oriHeight;
-              }
-              return Stack(
-                alignment: Alignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: widget.onTapOutside != null
-                        ? () => widget.onTapOutside?.call()
-                        : () {
-                            Navigator.pop(context);
-                          },
-                  ),
-                  AnimatedPositioned(
-                    duration: Duration(milliseconds: 200),
-                    curve: Curves.linearToEaseOut,
-                    top: isKeyboardVisible &&
-                            widget.pushDialogAboveWhenKeyboardShow
-                        ? 10
-                        : dialogPos.dy,
-                    left: dialogPos.dx,
-                    child: Material(
-                      clipBehavior: Clip.antiAlias,
-                      elevation: 0.0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius:
-                            BorderRadius.circular(widget.borderRadius),
-                      ),
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 50),
-                        curve: Curves.linearToEaseOut,
-                        height: dialogHeight,
-                        width: dialogWidth,
-                        clipBehavior: Clip.antiAlias,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(widget.borderRadius),
-                            bottomRight: Radius.circular(widget.borderRadius),
+                        if (widget.pushDialogAboveWhenKeyboardShow) {
+                          newHeight = oriHeight -
+                              (paddingWhenKeyboardShow -
+                                  (screenHeight - (oriHeight + 10)));
+                          enableArrow = false;
+                        }
+                        if (widget.adjustSizeWhenKeyboardShow) {
+                          if (newHeight <= dialogHeight) {
+                            dialogHeight =
+                                newHeight > 0 ? newHeight - 5 : oriHeight;
+                          }
+                        }
+                      } else {
+                        dialogHeight = oriHeight;
+                      }
+                      return Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              if (isDismissible != null && !isDismissible!) {
+                                return;
+                              }
+                              if (widget.onTapOutside != null) {
+                                widget.onTapOutside?.call();
+                                return;
+                              }
+                              Navigator.pop(context);
+                            },
                           ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: context.colorScheme.shadow,
-                              spreadRadius: 20,
-                              blurRadius: 30,
-                              offset: Offset(0, 0),
-                            ),
-                          ],
-                        ),
-                        child: Column(
-                          children: [
-                            widget.appBar ?? Container(),
-                            Expanded(child: widget.child),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: arrowPos.dy,
-                    left: arrowPos.dx,
-                    child: !enableArrow
-                        ? SizedBox.shrink()
-                        : Animate(
-                            effects: [
-                              ScaleEffect(
-                                  duration: Duration(milliseconds: 200),
-                                  alignment: getArrowAnimationAlignment())
-                            ],
-                            child: PhysicalModel(
-                              color: Colors.transparent,
-                              elevation: 3,
-                              shadowColor: Colors.grey.withOpacity(0.06),
-                              shape: BoxShape.circle,
-                              child: CustomPaint(
-                                painter: _getArrowPainter(getArrowPointing()),
-                                child: Container(
-                                  width:
-                                      getArrowPointing() == ArrowPointing.top ||
-                                              getArrowPointing() ==
-                                                  ArrowPointing.bottom
-                                          ? widget.arrowWidth
-                                          : widget.arrowHeight,
-                                  height:
-                                      getArrowPointing() == ArrowPointing.top ||
-                                              getArrowPointing() ==
-                                                  ArrowPointing.bottom
-                                          ? widget.arrowHeight
-                                          : widget.arrowWidth,
+                          AnimatedPositioned(
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.linearToEaseOut,
+                            top: isKeyboardVisible &&
+                                    widget.pushDialogAboveWhenKeyboardShow
+                                ? 10
+                                : dialogPos.dy,
+                            left: dialogPos.dx,
+                            child: Material(
+                              clipBehavior: Clip.antiAlias,
+                              elevation: 0.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius:
+                                    BorderRadius.circular(widget.borderRadius),
+                              ),
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 50),
+                                curve: Curves.linearToEaseOut,
+                                height: dialogHeight,
+                                width: dialogWidth,
+                                clipBehavior: Clip.antiAlias,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    bottomLeft:
+                                        Radius.circular(widget.borderRadius),
+                                    bottomRight:
+                                        Radius.circular(widget.borderRadius),
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: context.colorScheme.shadow,
+                                      spreadRadius: 20,
+                                      blurRadius: 30,
+                                      offset: const Offset(0, 0),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  children: [
+                                    widget.appBar ?? Container(),
+                                    Expanded(child: widget.child),
+                                  ],
                                 ),
                               ),
                             ),
                           ),
-                  )
-                ],
-              );
-            });
-          }),
-        ),
-      );
-    });
+                          Positioned(
+                            top: arrowPos.dy,
+                            left: arrowPos.dx,
+                            child: !enableArrow
+                                ? const SizedBox.shrink()
+                                : Animate(
+                                    effects: [
+                                      ScaleEffect(
+                                          duration:
+                                              const Duration(milliseconds: 200),
+                                          alignment:
+                                              getArrowAnimationAlignment())
+                                    ],
+                                    child: PhysicalModel(
+                                      color: Colors.transparent,
+                                      elevation: 3,
+                                      shadowColor:
+                                          Colors.grey.withOpacity(0.06),
+                                      shape: BoxShape.circle,
+                                      child: CustomPaint(
+                                        painter: _getArrowPainter(
+                                            getArrowPointing()),
+                                        child: SizedBox(
+                                          width: getArrowPointing() ==
+                                                      ArrowPointing.top ||
+                                                  getArrowPointing() ==
+                                                      ArrowPointing.bottom
+                                              ? widget.arrowWidth
+                                              : widget.arrowHeight,
+                                          height: getArrowPointing() ==
+                                                      ArrowPointing.top ||
+                                                  getArrowPointing() ==
+                                                      ArrowPointing.bottom
+                                              ? widget.arrowHeight
+                                              : widget.arrowWidth,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                          )
+                        ],
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   @override
@@ -554,5 +595,27 @@ class _CustomDialogState extends State<CustomDialog> {
     } else {
       return Alignment.centerRight;
     }
+  }
+}
+
+class DialogDismissible extends InheritedWidget {
+  final void Function(bool isDismissible) onUpdate;
+  const DialogDismissible({
+    super.key,
+    required this.onUpdate,
+    required super.child,
+  });
+
+  static DialogDismissible? of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<DialogDismissible>();
+  }
+
+  void update(bool isDismissible) {
+    onUpdate(isDismissible);
+  }
+
+  @override
+  bool updateShouldNotify(DialogDismissible oldWidget) {
+    return false;
   }
 }
