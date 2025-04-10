@@ -11,7 +11,6 @@ class CustomDialog extends StatefulWidget {
   final BuildContext context;
   final double? height;
   final double? width;
-  final Widget? appBar;
   final Widget child;
   final BuildContext? targetWidgetContext;
   final AlignTargetWidget alignTargetWidget;
@@ -31,12 +30,12 @@ class CustomDialog extends StatefulWidget {
   late final Offset targetWidgetPos;
   final GlobalKey? targetWidgetKey;
   final void Function()? onDismiss;
+  final bool hasShadow;
 
   CustomDialog({
     super.key,
     required this.context,
     required this.child,
-    this.appBar,
     this.width,
     this.height,
     this.alignTargetWidget = AlignTargetWidget.right,
@@ -56,6 +55,7 @@ class CustomDialog extends StatefulWidget {
     this.borderRadius = 10,
     this.targetWidgetKey,
     this.onDismiss,
+    this.hasShadow = false,
   }) {
     safeAreaTopHeight = MediaQueryData.fromView(View.of(context)).padding.top;
   }
@@ -455,42 +455,34 @@ class _CustomDialogState extends State<CustomDialog> {
                                 ? 10
                                 : dialogPos.dy,
                             left: dialogPos.dx,
-                            child: Material(
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 50),
+                              curve: Curves.linearToEaseOut,
+                              height: dialogHeight,
+                              width: dialogWidth,
                               clipBehavior: Clip.antiAlias,
-                              elevation: 0.0,
-                              shape: RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.circular(widget.borderRadius),
-                              ),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 50),
-                                curve: Curves.linearToEaseOut,
-                                height: dialogHeight,
-                                width: dialogWidth,
-                                clipBehavior: Clip.antiAlias,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                    bottomLeft:
-                                        Radius.circular(widget.borderRadius),
-                                    bottomRight:
-                                        Radius.circular(widget.borderRadius),
-                                  ),
-                                  boxShadow: [
+                              decoration: BoxDecoration(
+                                color: context.colorScheme.surface,
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft:
+                                      Radius.circular(widget.borderRadius),
+                                  bottomRight:
+                                      Radius.circular(widget.borderRadius),
+                                  topLeft: Radius.circular(widget.borderRadius),
+                                  topRight:
+                                      Radius.circular(widget.borderRadius),
+                                ),
+                                boxShadow: [
+                                  if (widget.hasShadow)
                                     BoxShadow(
-                                      color: context.colorScheme.shadow,
-                                      spreadRadius: 20,
-                                      blurRadius: 30,
+                                      color: Colors.grey.withOpacity(0.08),
+                                      spreadRadius: 3,
+                                      blurRadius: 5,
                                       offset: const Offset(0, 0),
                                     ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    widget.appBar ?? Container(),
-                                    Expanded(child: widget.child),
-                                  ],
-                                ),
+                                ],
                               ),
+                              child: widget.child,
                             ),
                           ),
                           Positioned(

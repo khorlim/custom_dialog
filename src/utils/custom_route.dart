@@ -60,6 +60,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   final Widget? customDialogBuilder;
   final GlobalKey? targetWidgetKey;
 
+  final bool hasShadow;
+
   // Define tweens as static final to avoid recreation
   static final _sizeTween = Tween<double>(begin: 0.0, end: 1.0)
       .chain(CurveTween(curve: Curves.linearToEaseOut));
@@ -134,6 +136,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.borderRadius = 10,
     this.customDialogBuilder,
     this.targetWidgetKey,
+    this.hasShadow = false,
   });
 
   @override
@@ -275,6 +278,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
             followArrow: followArrow ?? false,
             pushDialogAboveWhenKeyboardShow:
                 pushDialogAboveWhenKeyboardShow ?? false,
+            hasShadow: hasShadow,
             child: builder(context),
             onDismiss: () {
               if (dismissible != null) {
