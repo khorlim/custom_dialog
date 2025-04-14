@@ -5,7 +5,6 @@ import '../custom_dialog.dart';
 import '../custom_position_dialog.dart';
 import '../../dialog_manager/dialog_manager.dart';
 import '../../../../tunai_style/responsive/device_type.dart';
-import '../../../../tunai_style/old/theme/old_app_style.dart';
 
 class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
   final WidgetBuilder builder;
