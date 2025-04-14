@@ -143,7 +143,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   Duration get transitionDuration => Duration(milliseconds: 200);
 
   @override
-  Color get barrierColor => backgroundColor ?? black.withOpacity(0.2);
+  Color get barrierColor => backgroundColor ?? Colors.black.withOpacity(0.2);
 
   @override
   String get barrierLabel => 'CustomPageRoute';

@@ -140,7 +140,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
   });
 
   @override
-  Color get barrierColor => backgroundColor ?? black.withOpacity(0.2);
+  Color get barrierColor => backgroundColor ?? Colors.black.withOpacity(0.2);
 
   @override
   String get barrierLabel => 'CustomPageRoute';
