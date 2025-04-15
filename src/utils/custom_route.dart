@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../custom_dialog.dart';
 import '../custom_position_dialog.dart';
 import 'custom_modal_bottom_sheet.dart';
 import '../../dialog_manager/dialog_manager.dart';
 import '../../../../tunai_style/responsive/device_type.dart';
-import '../../../../tunai_style/old/theme/old_app_style.dart';
 
 class CustomPageRoute<T> extends PopupRoute<T> {
   final WidgetBuilder builder;
@@ -140,10 +138,10 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   });
 
   @override
-  Duration get transitionDuration => Duration(milliseconds: 200);
+  Duration get transitionDuration => const Duration(milliseconds: 200);
 
   @override
-  Color get barrierColor => backgroundColor ?? Colors.black.withOpacity(0.2);
+  Color get barrierColor => backgroundColor ?? Colors.black.withValues(alpha: 0.2);
 
   @override
   String get barrierLabel => 'CustomPageRoute';
@@ -179,7 +177,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
         child: CustomModalBottomSheet(
           enableDrag: false,
           route: this,
-          shape: RoundedRectangleBorder(
+          shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(20),
               topRight: Radius.circular(20),
