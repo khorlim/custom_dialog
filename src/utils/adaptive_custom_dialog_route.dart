@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pos_dialog/pos_dialog.dart';
 import '../custom_dialog.dart';
-import '../custom_position_dialog.dart';
 import '../../dialog_manager/dialog_manager.dart';
 import '../../../../tunai_style/responsive/device_type.dart';
 
@@ -139,7 +137,8 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
   });
 
   @override
-  Color get barrierColor => backgroundColor ?? Colors.black.withOpacity(0.2);
+  Color get barrierColor =>
+      backgroundColor ?? Colors.black.withValues(alpha: 0.2);
 
   @override
   String get barrierLabel => 'CustomPageRoute';
