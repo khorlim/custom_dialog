@@ -373,6 +373,7 @@ class _CustomDialogState extends State<CustomDialog> {
     return DialogDismissible(
       onUpdate: (isDismissible) {
         this.isDismissible = isDismissible;
+        print('updating custom dialog dismissible : $isDismissible');
       },
       child: OrientationBuilder(
         builder: (context, orientation) {

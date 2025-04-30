@@ -218,38 +218,38 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
             manualDialogWidth = maxWidth!;
           }
 
-          if (targetWidgetKey != null) {
-            return CustomPositionDialog(
-              targetWidgetKey: targetWidgetKey!,
-              context: context,
-              distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
-              height: height ??
-                  ((heightRatio != null || isCenterDialog)
-                      ? manaulDialogHeight
-                      : null),
-              width: width ??
-                  ((widthRatio != null || isCenterDialog)
-                      ? manualDialogWidth
-                      : null),
-              alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
-              enableArrow: enableArrow ?? true,
-              borderRadius: borderRadius,
-              onTapOutside: onTapOutside ??
-                  () {
-                    if (dismissible == null || dismissible?.value == true) {
-                      Navigator.pop(context);
-                      return;
-                    }
-                  },
-              adjustment: adjustment ?? Offset.zero,
-              showOverFlowArrow: showOverFlowArrow ?? true,
-              overflowLeft: overflowLeft ?? 0,
-              followArrow: followArrow ?? false,
-              pushDialogAboveWhenKeyboardShow:
-                  pushDialogAboveWhenKeyboardShow ?? false,
-              child: builder(context),
-            );
-          }
+          // if (targetWidgetKey != null) {
+          //   return CustomPositionDialog(
+          //     targetWidgetKey: targetWidgetKey!,
+          //     context: context,
+          //     distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
+          //     height: height ??
+          //         ((heightRatio != null || isCenterDialog)
+          //             ? manaulDialogHeight
+          //             : null),
+          //     width: width ??
+          //         ((widthRatio != null || isCenterDialog)
+          //             ? manualDialogWidth
+          //             : null),
+          //     alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
+          //     enableArrow: enableArrow ?? true,
+          //     borderRadius: borderRadius,
+          //     onTapOutside: onTapOutside ??
+          //         () {
+          //           if (dismissible == null || dismissible?.value == true) {
+          //             Navigator.pop(context);
+          //             return;
+          //           }
+          //         },
+          //     adjustment: adjustment ?? Offset.zero,
+          //     showOverFlowArrow: showOverFlowArrow ?? true,
+          //     overflowLeft: overflowLeft ?? 0,
+          //     followArrow: followArrow ?? false,
+          //     pushDialogAboveWhenKeyboardShow:
+          //         pushDialogAboveWhenKeyboardShow ?? false,
+          //     child: builder(context),
+          //   );
+          // }
 
           return CustomDialog(
             context: context,
@@ -264,7 +264,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
                     : null),
             alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
             enableArrow: enableArrow ?? true,
-            targetWidgetContext: targetCtxt,
+            targetWidgetContext: targetWidgetKey?.currentContext ?? targetCtxt,
             borderRadius: borderRadius,
             onTapOutside: onTapOutside ??
                 () {
