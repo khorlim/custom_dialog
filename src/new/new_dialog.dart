@@ -137,7 +137,7 @@ class NewDialogState extends State<NewDialog> {
             child: Container(
               decoration: BoxDecoration(boxShadow: [
                 BoxShadow(
-                  color: Colors.grey.withOpacity(0.15),
+                  color: Colors.grey.withValues(alpha: 0.15),
                   spreadRadius: 20,
                   blurRadius: 30,
                   offset: Offset(0, 0),
@@ -146,7 +146,7 @@ class NewDialogState extends State<NewDialog> {
               child: Material(
                 clipBehavior: Clip.antiAlias,
                 elevation: 0.0,
-                shadowColor: Colors.grey.withOpacity(0.3),
+                shadowColor: Colors.grey.withValues(alpha: 0.3),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(widget.borderRadius),
                 ),

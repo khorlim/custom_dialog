@@ -378,7 +378,7 @@ class _CustomPositionDialogState extends State<CustomPositionDialog> {
                     child: Container(
                       decoration: BoxDecoration(boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.15),
+                          color: Colors.grey.withValues(alpha: 0.15),
                           spreadRadius: 20,
                           blurRadius: 30,
                           offset: Offset(0, 0),
@@ -387,7 +387,7 @@ class _CustomPositionDialogState extends State<CustomPositionDialog> {
                       child: Material(
                         clipBehavior: Clip.antiAlias,
                         elevation: 0.0,
-                        shadowColor: Colors.grey.withOpacity(0.3),
+                        shadowColor: Colors.grey.withValues(alpha: 0.3),
                         shape: RoundedRectangleBorder(
                           borderRadius:
                               BorderRadius.circular(widget.borderRadius),
@@ -429,7 +429,7 @@ class _CustomPositionDialogState extends State<CustomPositionDialog> {
                             child: PhysicalModel(
                               color: Colors.transparent,
                               elevation: 3,
-                              shadowColor: Colors.grey.withOpacity(0.06),
+                              shadowColor: Colors.grey.withValues(alpha: 0.06),
                               shape: BoxShape.circle,
                               child: CustomPaint(
                                 painter: _getArrowPainter(getArrowPointing()),

@@ -261,7 +261,7 @@ class DialogManager {
     //     return showGeneralDialog(
     //       barrierLabel: "Barrier", // Used for semantics
     //       barrierDismissible: true,
-    //       barrierColor: black.withOpacity(0.2), // Background color
+    //       barrierColor: black.withValues(alpha: 0.2), // Background color
     //       transitionDuration: const Duration(milliseconds: 300),
     //       context: context,
     //       pageBuilder: (context, __, ___) {
@@ -299,7 +299,7 @@ class DialogManager {
   // Future<T?> showPositionDialog<T>() {
   //   return showAdaptiveDialog<T>(
   //     context: context,
-  //     barrierColor: black.withOpacity(0.2),
+  //     barrierColor: black.withValues(alpha: 0.2),
   //     builder: (_) {
   //       return CustomDialog(
   //         context: context,

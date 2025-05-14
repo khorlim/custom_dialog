@@ -476,7 +476,7 @@ class _CustomDialogState extends State<CustomDialog> {
                                 boxShadow: [
                                   if (widget.hasShadow)
                                     BoxShadow(
-                                      color: Colors.grey.withOpacity(0.08),
+                                      color: Colors.grey.withValues(alpha: 0.08),
                                       spreadRadius: 3,
                                       blurRadius: 5,
                                       offset: const Offset(0, 0),
@@ -503,7 +503,7 @@ class _CustomDialogState extends State<CustomDialog> {
                                       color: Colors.transparent,
                                       elevation: 3,
                                       shadowColor:
-                                          Colors.grey.withOpacity(0.06),
+                                          Colors.grey.withValues(alpha: 0.06),
                                       shape: BoxShape.circle,
                                       child: CustomPaint(
                                         painter: _getArrowPainter(
