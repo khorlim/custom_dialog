@@ -373,7 +373,7 @@ class _CustomDialogState extends State<CustomDialog> {
     return DialogDismissible(
       onUpdate: (isDismissible) {
         this.isDismissible = isDismissible;
-        print('updating custom dialog dismissible : $isDismissible');
+        print('Custom dialog dismissible updated: $isDismissible');
       },
       child: OrientationBuilder(
         builder: (context, orientation) {
@@ -476,7 +476,8 @@ class _CustomDialogState extends State<CustomDialog> {
                                 boxShadow: [
                                   if (widget.hasShadow)
                                     BoxShadow(
-                                      color: Colors.grey.withValues(alpha: 0.08),
+                                      color:
+                                          Colors.grey.withValues(alpha: 0.08),
                                       spreadRadius: 3,
                                       blurRadius: 5,
                                       offset: const Offset(0, 0),
