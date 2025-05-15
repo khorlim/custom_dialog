@@ -58,6 +58,8 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
   final GlobalKey? targetWidgetKey;
   final bool enableDrag;
 
+  final bool adjustSizeWhenKeyboardShow;
+
   // Define tweens as static final to avoid recreation
   static final _sizeTween = Tween<double>(begin: 0.0, end: 1.0)
       .chain(CurveTween(curve: Curves.linearToEaseOut));
@@ -133,6 +135,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
     this.customDialogBuilder,
     this.targetWidgetKey,
     this.enableDrag = true,
+    this.adjustSizeWhenKeyboardShow = true,
     super.duration = const Duration(milliseconds: 200),
   });
 
@@ -279,6 +282,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
             pushDialogAboveWhenKeyboardShow:
                 pushDialogAboveWhenKeyboardShow ?? false,
             child: builder(context),
+            adjustSizeWhenKeyboardShow: adjustSizeWhenKeyboardShow,
             onDismiss: () {
               if (dismissible != null) {
                 dismissible?.dispose();

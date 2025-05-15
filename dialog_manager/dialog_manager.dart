@@ -175,6 +175,8 @@ class DialogManager {
 
   final bool enableDrag;
 
+  final bool adjustSizeWhenKeyboardShow;
+
   // Constructor with required parameters and optional parameters with default values
   DialogManager({
     this.context,
@@ -201,6 +203,7 @@ class DialogManager {
     this.dismissible,
     this.targetWidgetKey,
     this.enableDrag = true,
+    this.adjustSizeWhenKeyboardShow = true,
   }) : deviceType = getDeviceType(context ?? TunaiNavigator.currentContext);
 
   final pageIndexNotifier = ValueNotifier(0);
@@ -220,6 +223,7 @@ class DialogManager {
               return child;
             },
           ),
+          adjustSizeWhenKeyboardShow: adjustSizeWhenKeyboardShow,
           enableDrag: enableDrag,
           dialogType: dialogType,
           width: width,
