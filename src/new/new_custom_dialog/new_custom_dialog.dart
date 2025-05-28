@@ -184,7 +184,7 @@ class _DialogController extends ChangeNotifier {
   late _DialogPositionCalculator _positionCalculator;
 
   // Cached values for performance
-  Size? _cachedDialogSize;
+  // Size? _cachedDialogSize;
   Offset? _cachedPosition;
   String? _lastCacheKey;
 
@@ -411,7 +411,7 @@ class _DialogController extends ChangeNotifier {
 
   void _clearCache() {
     _cachedPosition = null;
-    _cachedDialogSize = null;
+    // _cachedDialogSize = null;
     _lastCacheKey = null;
   }
 

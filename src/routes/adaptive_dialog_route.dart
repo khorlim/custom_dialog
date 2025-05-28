@@ -3,7 +3,6 @@ import 'package:pos_dialog/pos_dialog.dart';
 import '../custom_dialog.dart';
 import '../../dialog_manager/dialog_manager.dart';
 import '../../../../tunai_style/responsive/device_type.dart';
-import '../new/new_custom_dialog/new_custom_dialog.dart';
 
 class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
   final WidgetBuilder builder;
@@ -204,13 +203,13 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
             followArrow: followArrow ?? false,
             pushDialogAboveWhenKeyboardShow:
                 pushDialogAboveWhenKeyboardShow ?? false,
-            child: builder(context),
             adjustSizeWhenKeyboardShow: adjustSizeWhenKeyboardShow,
             onDismiss: () {
               if (dismissible != null) {
                 dismissible?.dispose();
               }
             },
+            child: builder(context),
           );
         });
 
