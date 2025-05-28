@@ -140,7 +140,7 @@ class DialogManager {
   final BuildContext? targetWidgetContext;
 
   // Callback function triggered when tapping outside the dialog
-  final Function? onTapOutside;
+  final void Function()? onTapOutside;
 
   // Offset adjustment for fine-tuning the dialog position
   final Offset? adjustment;

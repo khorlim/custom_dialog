@@ -3,6 +3,7 @@ import 'package:pos_dialog/pos_dialog.dart';
 import '../custom_dialog.dart';
 import '../../dialog_manager/dialog_manager.dart';
 import '../../../../tunai_style/responsive/device_type.dart';
+import '../new/new_custom_dialog/new_custom_dialog.dart';
 
 class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
   final WidgetBuilder builder;
@@ -26,7 +27,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
 
   final BuildContext? targetWidgetContext;
 
-  final Function? onTapOutside;
+  final void Function()? onTapOutside;
 
   final Offset? adjustment;
 
@@ -174,39 +175,6 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
             // debugPrint('using max width : $maxWidth');
             manualDialogWidth = maxWidth!;
           }
-
-          // if (targetWidgetKey != null) {
-          //   return CustomPositionDialog(
-          //     targetWidgetKey: targetWidgetKey!,
-          //     context: context,
-          //     distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
-          //     height: height ??
-          //         ((heightRatio != null || isCenterDialog)
-          //             ? manaulDialogHeight
-          //             : null),
-          //     width: width ??
-          //         ((widthRatio != null || isCenterDialog)
-          //             ? manualDialogWidth
-          //             : null),
-          //     alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
-          //     enableArrow: enableArrow ?? true,
-          //     borderRadius: borderRadius,
-          //     onTapOutside: onTapOutside ??
-          //         () {
-          //           if (dismissible == null || dismissible?.value == true) {
-          //             Navigator.pop(context);
-          //             return;
-          //           }
-          //         },
-          //     adjustment: adjustment ?? Offset.zero,
-          //     showOverFlowArrow: showOverFlowArrow ?? true,
-          //     overflowLeft: overflowLeft ?? 0,
-          //     followArrow: followArrow ?? false,
-          //     pushDialogAboveWhenKeyboardShow:
-          //         pushDialogAboveWhenKeyboardShow ?? false,
-          //     child: builder(context),
-          //   );
-          // }
 
           return CustomDialog(
             context: context,

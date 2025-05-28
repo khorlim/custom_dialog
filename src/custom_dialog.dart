@@ -201,8 +201,9 @@ class _CustomDialogState extends State<CustomDialog> {
     super.didUpdateWidget(oldWidget);
 
     if (widget.height != oldWidget.height || widget.width != oldWidget.width) {
-      getDialogHeight(MediaQuery.of(widget.context).orientation);
-      getDialogWidth(MediaQuery.of(widget.context).orientation);
+      final mediaQuery = MediaQuery.of(widget.context);
+      getDialogHeight(mediaQuery.orientation);
+      getDialogWidth(mediaQuery.orientation);
 
       updateRenderBox();
       updateDialogPos(widget.context);
@@ -364,8 +365,9 @@ class _CustomDialogState extends State<CustomDialog> {
 
   @override
   Widget build(BuildContext context) {
-    screenHeight = MediaQuery.of(context).size.height;
-    screenWidth = MediaQuery.of(context).size.width;
+    final mediaQuery = MediaQuery.of(context);
+    screenHeight = mediaQuery.size.height;
+    screenWidth = mediaQuery.size.width;
 
     // print('-------');
     // print('dialogPos: $dialogPos');
@@ -377,24 +379,14 @@ class _CustomDialogState extends State<CustomDialog> {
       },
       child: OrientationBuilder(
         builder: (context, orientation) {
-          getDialogHeight(orientation);
-          getDialogWidth(orientation);
-
           // print('dialogHeight: $dialogHeight, dialogWidth: $dialogWidth');
 
           //   print('dialog left pos: $dialogPos.dx, dialog top pos: $dialogPos.dy');
 
           if (oldOrientation != orientation) {
+            getDialogHeight(orientation);
+            getDialogWidth(orientation);
             updateDialogPos(context, forceCenter: true);
-            // Future.delayed(Duration(milliseconds: 500), () {
-            //   if (mounted) {
-            //     setState(() {
-            //       static = false;
-            //       enableArrow = false;
-            //     });
-            //     updateDialogPos();
-            //   }
-            // });
           }
           oldOrientation = orientation;
 
@@ -449,16 +441,16 @@ class _CustomDialogState extends State<CustomDialog> {
                             },
                           ),
                           AnimatedPositioned(
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.linearToEaseOut,
+                            duration: const Duration(milliseconds: 0),
+                            curve: Curves.easeOut,
                             top: isKeyboardVisible &&
                                     widget.pushDialogAboveWhenKeyboardShow
                                 ? 10
                                 : dialogPos.dy,
                             left: dialogPos.dx,
                             child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 50),
-                              curve: Curves.linearToEaseOut,
+                              duration: const Duration(milliseconds: 200),
+                              curve: Curves.easeOut,
                               height: dialogHeight,
                               width: dialogWidth,
                               clipBehavior: Clip.antiAlias,
