@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:pos_dialog/pos_dialog.dart';
 import '../custom_dialog.dart';
-import '../custom_position_dialog.dart';
-import 'custom_modal_bottom_sheet.dart';
 import '../../dialog_manager/dialog_manager.dart';
 import '../../../../tunai_style/responsive/device_type.dart';
 
-class CustomPageRoute<T> extends PopupRoute<T> {
+class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
   final WidgetBuilder builder;
   final DialogType dialogType;
 
@@ -48,7 +47,6 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   final bool keepDialogOnMobile;
   final ValueNotifier<bool>? dismissible;
   final Color? backgroundColor;
-  final bool isPopupMenu;
 
   final double? maxHeight;
   final double? maxWidth;
@@ -57,52 +55,11 @@ class CustomPageRoute<T> extends PopupRoute<T> {
 
   final Widget? customDialogBuilder;
   final GlobalKey? targetWidgetKey;
+  final bool enableDrag;
 
-  final bool hasShadow;
+  final bool adjustSizeWhenKeyboardShow;
 
-  // Define tweens as static final to avoid recreation
-  static final _sizeTween = Tween<double>(begin: 0.0, end: 1.0)
-      .chain(CurveTween(curve: Curves.linearToEaseOut));
-  static final _fadeTween = Tween<double>(begin: 0.3, end: 1.0)
-      .chain(CurveTween(curve: Curves.linearToEaseOut));
-  static final _closingFadeTween = Tween<double>(begin: 0, end: 1)
-      .chain(CurveTween(curve: Curves.linearToEaseOut));
-  static final _closingSizeTween = Tween<double>(begin: 0.0, end: 1)
-      .chain(CurveTween(curve: Curves.easeOutBack));
-
-  // Cache RenderBox calculations
-  RenderBox? _cachedRenderBox;
-  Size? _cachedSize;
-  Offset? _cachedPosition;
-  Alignment? _cachedAlignment;
-
-  void _updateCachedValues(BuildContext context) {
-    RenderBox? renderBox;
-    if (targetWidgetKey != null &&
-        targetWidgetKey?.currentContext != null &&
-        targetWidgetKey!.currentContext!.mounted) {
-      renderBox =
-          targetWidgetKey?.currentContext?.findRenderObject() as RenderBox?;
-    } else if (targetWidgetContext != null && targetWidgetContext!.mounted) {
-      renderBox = targetWidgetContext?.findRenderObject() as RenderBox?;
-    }
-
-    if (renderBox != _cachedRenderBox) {
-      _cachedRenderBox = renderBox;
-      _cachedSize = renderBox?.size ?? Size.zero;
-      _cachedPosition = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
-
-      Size screenSize = MediaQuery.of(context).size;
-      Offset centerPos = Offset(_cachedPosition!.dx + (_cachedSize!.width / 2),
-          _cachedPosition!.dy + (_cachedSize!.height / 2));
-
-      double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
-      double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
-      _cachedAlignment = Alignment(fractionHorizontal, fractionVertical);
-    }
-  }
-
-  CustomPageRoute({
+  AdaptiveDialogRoute({
     required this.builder,
     this.dialogType = DialogType.adaptivePosition,
     this.width,
@@ -128,26 +85,25 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     this.widthRatioInPortrait,
     this.dismissible,
     this.backgroundColor,
-    this.isPopupMenu = false,
     this.maxHeight,
     this.maxWidth,
     this.borderRadius = 10,
     this.customDialogBuilder,
     this.targetWidgetKey,
-    this.hasShadow = false,
+    this.enableDrag = true,
+    this.adjustSizeWhenKeyboardShow = true,
+    super.duration = const Duration(milliseconds: 200),
   });
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 200);
+  Color get barrierColor =>
+      backgroundColor ?? Colors.black.withValues(alpha: 0.2);
 
   @override
-  Color get barrierColor => backgroundColor ?? Colors.black.withValues(alpha: 0.2);
+  String get barrierLabel => 'AdaptiveDialogRoute';
 
   @override
-  String get barrierLabel => 'CustomPageRoute';
-
-  // @override
-  // bool get maintainState => true;
+  bool get maintainState => true;
 
   bool get isCenterDialog =>
       dialogType == DialogType.center ||
@@ -174,16 +130,20 @@ class CustomPageRoute<T> extends PopupRoute<T> {
     if (showModalBottom) {
       return SafeArea(
         bottom: false,
-        child: CustomModalBottomSheet(
-          enableDrag: false,
+        child: PosBottomSheet<T>(
+          closeProgressThreshold: null,
           route: this,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          clipBehavior: Clip.antiAlias,
+          secondAnimationController: null,
+          expanded: true,
+          bounce: false,
+          enableDrag: enableDrag,
+          animationCurve: animationCurve,
+          builder: (context) => ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(16.0),
+                topRight: Radius.circular(16.0),
+              ),
+              child: builder(context)),
         ),
       );
     }
@@ -215,38 +175,38 @@ class CustomPageRoute<T> extends PopupRoute<T> {
             manualDialogWidth = maxWidth!;
           }
 
-          if (targetWidgetKey != null) {
-            return CustomPositionDialog(
-              targetWidgetKey: targetWidgetKey!,
-              context: context,
-              distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
-              height: height ??
-                  ((heightRatio != null || isCenterDialog)
-                      ? manaulDialogHeight
-                      : null),
-              width: width ??
-                  ((widthRatio != null || isCenterDialog)
-                      ? manualDialogWidth
-                      : null),
-              alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
-              enableArrow: enableArrow ?? true,
-              borderRadius: borderRadius,
-              onTapOutside: onTapOutside ??
-                  () {
-                    if (dismissible == null || dismissible?.value == true) {
-                      Navigator.pop(context);
-                      return;
-                    }
-                  },
-              adjustment: adjustment ?? Offset.zero,
-              showOverFlowArrow: showOverFlowArrow ?? true,
-              overflowLeft: overflowLeft ?? 0,
-              followArrow: followArrow ?? false,
-              pushDialogAboveWhenKeyboardShow:
-                  pushDialogAboveWhenKeyboardShow ?? false,
-              child: builder(context),
-            );
-          }
+          // if (targetWidgetKey != null) {
+          //   return CustomPositionDialog(
+          //     targetWidgetKey: targetWidgetKey!,
+          //     context: context,
+          //     distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
+          //     height: height ??
+          //         ((heightRatio != null || isCenterDialog)
+          //             ? manaulDialogHeight
+          //             : null),
+          //     width: width ??
+          //         ((widthRatio != null || isCenterDialog)
+          //             ? manualDialogWidth
+          //             : null),
+          //     alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
+          //     enableArrow: enableArrow ?? true,
+          //     borderRadius: borderRadius,
+          //     onTapOutside: onTapOutside ??
+          //         () {
+          //           if (dismissible == null || dismissible?.value == true) {
+          //             Navigator.pop(context);
+          //             return;
+          //           }
+          //         },
+          //     adjustment: adjustment ?? Offset.zero,
+          //     showOverFlowArrow: showOverFlowArrow ?? true,
+          //     overflowLeft: overflowLeft ?? 0,
+          //     followArrow: followArrow ?? false,
+          //     pushDialogAboveWhenKeyboardShow:
+          //         pushDialogAboveWhenKeyboardShow ?? false,
+          //     child: builder(context),
+          //   );
+          // }
 
           return CustomDialog(
             context: context,
@@ -261,7 +221,7 @@ class CustomPageRoute<T> extends PopupRoute<T> {
                     : null),
             alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
             enableArrow: enableArrow ?? true,
-            targetWidgetContext: targetCtxt,
+            targetWidgetContext: targetWidgetKey?.currentContext ?? targetCtxt,
             borderRadius: borderRadius,
             onTapOutside: onTapOutside ??
                 () {
@@ -276,8 +236,8 @@ class CustomPageRoute<T> extends PopupRoute<T> {
             followArrow: followArrow ?? false,
             pushDialogAboveWhenKeyboardShow:
                 pushDialogAboveWhenKeyboardShow ?? false,
-            hasShadow: hasShadow,
             child: builder(context),
+            adjustSizeWhenKeyboardShow: adjustSizeWhenKeyboardShow,
             onDismiss: () {
               if (dismissible != null) {
                 dismissible?.dispose();
@@ -290,19 +250,24 @@ class CustomPageRoute<T> extends PopupRoute<T> {
   }
 
   @override
+  Widget buildBottomSheet(BuildContext context) {
+    // TODO: implement buildBottomSheet
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget buildDialog(BuildContext context) {
+    // TODO: implement buildDialog
+    throw UnimplementedError();
+  }
+
+  @override
   Widget buildTransitions(BuildContext context, Animation<double> animation,
       Animation<double> secondaryAnimation, Widget child) {
     deviceType = getDeviceType(context);
     if (useSlideTransition) {
       return buildSlideTransition(
           context, animation, secondaryAnimation, child);
-    } else if (isPopupMenu) {
-      return buildPopupTransition(
-        context,
-        animation,
-        secondaryAnimation,
-        child,
-      );
     } else {
       return buildDialogTransition(
           context, animation, secondaryAnimation, child);
@@ -331,31 +296,6 @@ class CustomPageRoute<T> extends PopupRoute<T> {
       opacity: fadeAnimation,
       child: SlideTransition(
         position: offsetAnimation,
-        child: child,
-      ),
-    );
-  }
-
-  Widget buildPopupTransition(BuildContext context, Animation<double> animation,
-      Animation<double> secondaryAnimation, Widget child) {
-    _updateCachedValues(context);
-
-    if (animation.status == AnimationStatus.reverse) {
-      return FadeTransition(
-        opacity: animation.drive(_closingFadeTween),
-        child: ScaleTransition(
-          alignment: _cachedAlignment!,
-          scale: animation.drive(_closingSizeTween),
-          child: child,
-        ),
-      );
-    }
-
-    return FadeTransition(
-      opacity: animation.drive(_fadeTween),
-      child: ScaleTransition(
-        alignment: _cachedAlignment!,
-        scale: animation.drive(_sizeTween),
         child: child,
       ),
     );

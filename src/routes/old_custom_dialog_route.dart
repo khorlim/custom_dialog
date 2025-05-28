@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:pos_dialog/pos_dialog.dart';
 import '../custom_dialog.dart';
+import '../custom_position_dialog.dart';
+import '../utils/custom_modal_bottom_sheet.dart';
 import '../../dialog_manager/dialog_manager.dart';
 import '../../../../tunai_style/responsive/device_type.dart';
 
-class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
+@Deprecated('Use Adaptive Dialog Route instead')
+class OldCustomDialogRoute<T> extends PopupRoute<T> {
   final WidgetBuilder builder;
   final DialogType dialogType;
 
@@ -56,9 +58,8 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
 
   final Widget? customDialogBuilder;
   final GlobalKey? targetWidgetKey;
-  final bool enableDrag;
 
-  final bool adjustSizeWhenKeyboardShow;
+  final bool hasShadow;
 
   // Define tweens as static final to avoid recreation
   static final _sizeTween = Tween<double>(begin: 0.0, end: 1.0)
@@ -102,7 +103,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
     }
   }
 
-  AdaptiveDialogRoute({
+  OldCustomDialogRoute({
     required this.builder,
     this.dialogType = DialogType.adaptivePosition,
     this.width,
@@ -134,10 +135,11 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
     this.borderRadius = 10,
     this.customDialogBuilder,
     this.targetWidgetKey,
-    this.enableDrag = true,
-    this.adjustSizeWhenKeyboardShow = true,
-    super.duration = const Duration(milliseconds: 200),
+    this.hasShadow = false,
   });
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 200);
 
   @override
   Color get barrierColor =>
@@ -172,25 +174,20 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
     deviceType = getDeviceType(context);
 
     if (showModalBottom) {
-      Widget bottomSheet = SafeArea(
+      return SafeArea(
         bottom: false,
-        child: PosBottomSheet<T>(
-          closeProgressThreshold: null,
+        child: CustomModalBottomSheet(
+          enableDrag: false,
           route: this,
-          secondAnimationController: null,
-          expanded: true,
-          bounce: false,
-          enableDrag: enableDrag,
-          animationCurve: animationCurve,
-          builder: (context) => ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16.0),
-                topRight: Radius.circular(16.0),
-              ),
-              child: builder(context)),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          clipBehavior: Clip.antiAlias,
         ),
       );
-      return bottomSheet;
     }
 
     double screenHeight = MediaQuery.of(context).size.height;
@@ -220,38 +217,38 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
             manualDialogWidth = maxWidth!;
           }
 
-          // if (targetWidgetKey != null) {
-          //   return CustomPositionDialog(
-          //     targetWidgetKey: targetWidgetKey!,
-          //     context: context,
-          //     distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
-          //     height: height ??
-          //         ((heightRatio != null || isCenterDialog)
-          //             ? manaulDialogHeight
-          //             : null),
-          //     width: width ??
-          //         ((widthRatio != null || isCenterDialog)
-          //             ? manualDialogWidth
-          //             : null),
-          //     alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
-          //     enableArrow: enableArrow ?? true,
-          //     borderRadius: borderRadius,
-          //     onTapOutside: onTapOutside ??
-          //         () {
-          //           if (dismissible == null || dismissible?.value == true) {
-          //             Navigator.pop(context);
-          //             return;
-          //           }
-          //         },
-          //     adjustment: adjustment ?? Offset.zero,
-          //     showOverFlowArrow: showOverFlowArrow ?? true,
-          //     overflowLeft: overflowLeft ?? 0,
-          //     followArrow: followArrow ?? false,
-          //     pushDialogAboveWhenKeyboardShow:
-          //         pushDialogAboveWhenKeyboardShow ?? false,
-          //     child: builder(context),
-          //   );
-          // }
+          if (targetWidgetKey != null) {
+            return CustomPositionDialog(
+              targetWidgetKey: targetWidgetKey!,
+              context: context,
+              distanceBetweenTargetWidget: distanceBetweenTargetWidget ?? 0,
+              height: height ??
+                  ((heightRatio != null || isCenterDialog)
+                      ? manaulDialogHeight
+                      : null),
+              width: width ??
+                  ((widthRatio != null || isCenterDialog)
+                      ? manualDialogWidth
+                      : null),
+              alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
+              enableArrow: enableArrow ?? true,
+              borderRadius: borderRadius,
+              onTapOutside: onTapOutside ??
+                  () {
+                    if (dismissible == null || dismissible?.value == true) {
+                      Navigator.pop(context);
+                      return;
+                    }
+                  },
+              adjustment: adjustment ?? Offset.zero,
+              showOverFlowArrow: showOverFlowArrow ?? true,
+              overflowLeft: overflowLeft ?? 0,
+              followArrow: followArrow ?? false,
+              pushDialogAboveWhenKeyboardShow:
+                  pushDialogAboveWhenKeyboardShow ?? false,
+              child: builder(context),
+            );
+          }
 
           return CustomDialog(
             context: context,
@@ -266,7 +263,7 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
                     : null),
             alignTargetWidget: alignTargetWidget ?? AlignTargetWidget.right,
             enableArrow: enableArrow ?? true,
-            targetWidgetContext: targetWidgetKey?.currentContext ?? targetCtxt,
+            targetWidgetContext: targetCtxt,
             borderRadius: borderRadius,
             onTapOutside: onTapOutside ??
                 () {
@@ -281,8 +278,8 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
             followArrow: followArrow ?? false,
             pushDialogAboveWhenKeyboardShow:
                 pushDialogAboveWhenKeyboardShow ?? false,
+            hasShadow: hasShadow,
             child: builder(context),
-            adjustSizeWhenKeyboardShow: adjustSizeWhenKeyboardShow,
             onDismiss: () {
               if (dismissible != null) {
                 dismissible?.dispose();
@@ -292,18 +289,6 @@ class AdaptiveDialogRoute<T> extends BaseAdaptivePosDialogRoute<T> {
         });
 
     return dialog;
-  }
-
-  @override
-  Widget buildBottomSheet(BuildContext context) {
-    // TODO: implement buildBottomSheet
-    throw UnimplementedError();
-  }
-
-  @override
-  Widget buildDialog(BuildContext context) {
-    // TODO: implement buildDialog
-    throw UnimplementedError();
   }
 
   @override

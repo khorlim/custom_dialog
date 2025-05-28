@@ -2,7 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'custom_route.dart';
+import '../routes/old_custom_dialog_route.dart';
 
 const Curve _modalBottomSheetCurve = Easing.standardDecelerate;
 const double _defaultScrollControlDisabledMaxHeightRatio = 9.0 / 16.0;
@@ -23,7 +23,7 @@ class CustomModalBottomSheet<T> extends StatefulWidget {
     this.showDragHandle = false,
   });
 
-  final CustomPageRoute<T> route;
+  final OldCustomDialogRoute<T> route;
   final bool isScrollControlled;
   final double scrollControlDisabledMaxHeightRatio;
   final Color? backgroundColor;
