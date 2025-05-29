@@ -116,6 +116,8 @@ class PopupMenuRoute<T> extends PopupRoute<T> {
   RenderBox? _getRenderBox() {
     BuildContext targetCtxt = _getTargetContext();
 
+    if (!targetCtxt.mounted) return null;
+
     return targetCtxt.findRenderObject() as RenderBox?;
   }
 
