@@ -118,7 +118,11 @@ class PopupMenuRoute<T> extends PopupRoute<T> {
 
     if (!targetCtxt.mounted) return null;
 
-    return targetCtxt.findRenderObject() as RenderBox?;
+    try {
+      return targetCtxt.findRenderObject() as RenderBox?;
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
