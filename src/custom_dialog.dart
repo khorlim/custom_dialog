@@ -254,6 +254,11 @@ class _CustomDialogState extends State<CustomDialog> {
           dialogPos = calculator.getAlignLeft();
         }
 
+        if (calculator.isExceedLeft(dialogPos.dx)) {
+          alignTargetWidget = AlignTargetWidget.right;
+          dialogPos = calculator.getAlignRight();
+        }
+
         break;
 
       case AlignTargetWidget.left || AlignTargetWidget.leftCenter:
@@ -262,6 +267,11 @@ class _CustomDialogState extends State<CustomDialog> {
         if (calculator.isExceedLeft(dialogPos.dx)) {
           alignTargetWidget = AlignTargetWidget.right;
           dialogPos = calculator.getAlignRight();
+        }
+
+        if (calculator.isExceedRight(dialogPos.dx)) {
+          alignTargetWidget = AlignTargetWidget.left;
+          dialogPos = calculator.getAlignLeft();
         }
 
         break;
