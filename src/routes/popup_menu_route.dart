@@ -72,36 +72,48 @@ class PopupMenuRoute<T> extends PopupRoute<T> {
       Animation<double> secondaryAnimation, Widget child) {
     RenderBox? renderBox = _getRenderBox();
 
-    final size = renderBox?.size ?? Size.zero;
-    final position = renderBox?.localToGlobal(Offset.zero) ?? Offset.zero;
+    if (renderBox == null || !renderBox.hasSize || !renderBox.attached) {
+      return child;
+    }
 
-    Size screenSize = MediaQuery.of(context).size;
-    Offset centerPos =
-        Offset(position.dx + (size.width / 2), position.dy + (size.height / 2));
+    try {
+      final size = renderBox.size;
+      if (size.width <= 0 || size.height <= 0) {
+        return child;
+      }
+      final position = renderBox.localToGlobal(Offset.zero);
 
-    double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
-    double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
-    final alignment = Alignment(fractionHorizontal, fractionVertical);
+      Size screenSize = MediaQuery.of(context).size;
+      Offset centerPos = Offset(
+          position.dx + (size.width / 2), position.dy + (size.height / 2));
 
-    if (animation.status == AnimationStatus.reverse) {
+      double fractionHorizontal = (2 * centerPos.dx / screenSize.width) - 1;
+      double fractionVertical = (2 * centerPos.dy / screenSize.height) - 1;
+      final alignment = Alignment(fractionHorizontal, fractionVertical);
+
+      if (animation.status == AnimationStatus.reverse) {
+        return FadeTransition(
+          opacity: animation.drive(_closingFadeTween),
+          child: ScaleTransition(
+            alignment: alignment,
+            scale: animation.drive(_closingSizeTween),
+            child: child,
+          ),
+        );
+      }
+
       return FadeTransition(
-        opacity: animation.drive(_closingFadeTween),
+        opacity: animation.drive(_fadeTween),
         child: ScaleTransition(
           alignment: alignment,
-          scale: animation.drive(_closingSizeTween),
+          scale: animation.drive(_sizeTween),
           child: child,
         ),
       );
+    } catch (e) {
+      // print('Error in PopupMenuRoute buildTransitions: $e');
+      return child;
     }
-
-    return FadeTransition(
-      opacity: animation.drive(_fadeTween),
-      child: ScaleTransition(
-        alignment: alignment,
-        scale: animation.drive(_sizeTween),
-        child: child,
-      ),
-    );
   }
 
   BuildContext _getTargetContext() {
